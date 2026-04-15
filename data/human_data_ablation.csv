@@ -1,0 +1,5 @@
+Method,Pick and Place,Articulated,In-Domain Avg,Unseen Obj Appearance,Unseen Obj-Container Combs,OOD Avg,Unseen Obj-Type PP,Unseen Obj-Type Art
+Unified-token (24×100 trajs),0.4170,0.5666,0.455,0.370,0.407347826,0.29,0.441,0.355
+Unified-token (24×100 trajs w/ human),0.4940,0.5170,0.4998,0.427,0.430086957,0.33,0.461,0.382
+Unified-token (24×1000 trajs),0.6220,0.6870,0.638,0.590,0.544243478,0.39,0.647,0.384
+Unified-token (24×1000 trajs w/ human),0.6200,0.6670,0.6318,0.561,0.574,0.39,0.657,0.453

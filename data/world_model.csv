@@ -1,0 +1,7 @@
+Dataset,Method,PSNR,SSIM,Latent_L2,FVD
+Droid,Raw Action,21.020,0.820,0.097,76.380
+Droid,Latent Action,21.320,0.823,0.095,76.440
+Egodex,Raw Action,24.840,0.800,0.164,171.370
+Egodex,Latent Action,28.060,0.858,0.086,130.870
+Robocasa,Raw Action,13.450,0.590,0.259,237.130
+Robocasa,Latent Action,17.660,0.718,0.142,166.500

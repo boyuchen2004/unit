@@ -1,0 +1,5 @@
+Method,Zero-Shot
+GR00T-Qwen2.5,0/10
+VLA-UniT w/o Cross-Recon,0/10
+VLA-UniT w/o Human,1/10
+VLA-UniT w/ Human,6/10

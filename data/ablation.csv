@@ -1,0 +1,5 @@
+Method,Pick and Place,Articulated,In-Domain Avg,Unseen Obj Appearance,Unseen Obj-Container Combs,OOD Pick and Place Avg,Unseen Obj-Type,Unseen Obj-Type Articulated
+Unified-token,0.667,0.62,0.655,0.572,0.404,0.574,0.657,0.453
+w/o cross reconstruction,0.4111,0.496,0.4325,0.343,0.26,0.3307826086956522,0.384,0.248
+Vision-token,0.57,0.6233,0.5833,0.53,0.3725,0.5026,0.5914,0.3644
+Action-token,0.636,0.567,0.618,0.4944,0.326,0.4948,0.62,0.3

@@ -1,0 +1,5 @@
+Method,Articulated,Pick and Place,Overall,Data Scale
+GR00T-Qwen2.5,0.1944,0.2667,0.213,24×100 trajs
+VLA-UniT,0.4170,0.5666,0.455,24×100 trajs
+GR00T-Qwen2.5,0.4700,0.5033,0.478,24×1000 trajs
+VLA-UniT,0.6733,0.6467,0.667,24×1000 trajs

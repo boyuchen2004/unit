@@ -1,0 +1,85 @@
+# ── Raw data (724 MB of .npz files) ──
+data/tsne/*.npz
+
+# ── Paper source ──
+paper.tex
+paper_copy.tex
+
+# ── PDF plots ──
+*.pdf
+
+# ── IDE / tool configs ──
+.claude/
+claude-code.txt
+
+# ── Backup / original images ──
+_method_vla.png
+_method_wm.png
+
+# ── Unused subdirectories ──
+method/
+paper_plot/
+Figure1_Method_Comparison*
+
+# ── Large source videos (web-compressed mp4 in web/ used instead) ──
+movies/robocasa/articulated/
+movies/robocasa/pnp/
+
+# ── MOV source files (mp4 versions used on site) ──
+movies/droid/*.mov
+movies/real/id/*.mov
+movies/real/robot_demo/*.mov
+movies/robocasa/ood/web/*.mov
+# comb-1.mov and comb-2.mov are directly referenced by index.html
+movies/real/ood/*.mov
+!movies/real/ood/comb-1.mov
+!movies/real/ood/comb-2.mov
+
+# ── Unused video variants in real/id (only banana.mp4, bowl.mp4, pour-*.mp4 referenced) ──
+movies/real/id/banana1.*
+movies/real/id/banana-1.*
+movies/real/id/banana-1-2.*
+movies/real/id/bowl-1.*
+movies/real/id/bowl-1-1.*
+movies/real/id/bowl-1(1).*
+
+# ── Unused video in robot_demo ──
+movies/real/robot_demo/robot-bowl.mp4
+
+# ── Unreferenced .mov with parentheses ──
+movies/real/ood/bowl-ood1(1).mov
+
+# ── Static plot PNGs (now rendered dynamically by Chart.js in index.html) ──
+/ablation.png
+/ablation_indomain.png
+/ablation_ood.png
+/data_efficiency.png
+/elo_battle.png
+/experiment_table.png
+/human_data_ablation.png
+/real_robot.png
+/real_robot_indomain.png
+/teaser_ablation.png
+/teaser_method_comparison.png
+/teaser_real_robot.png
+/teaser_wm_epe.png
+/teaser_wm_human_pretrain.png
+/teaser_zero_shot.png
+/tsne_latent_action.png
+/tsne_raw_action.png
+/tsne_raw_vs_latent_density.png
+/tsne_vl_features.png
+/tsne_vl_unified.png
+/tsne_wm_action_baseline.png
+/tsne_wm_action_unified.png
+/umap_latent_action.png
+/world_model_improvement.png
+/world_model_radar.png
+/world_model_table.png
+/zero_shot.png
+/method_comparison.png
+
+# ── Unused figs (only teaser.png referenced by index.html) ──
+figs/*.png
+!figs/teaser.png
+figs/*.pdf

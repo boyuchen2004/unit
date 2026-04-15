@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniT: Unified Physical Language for Human-to-Humanoid Transfer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #fdfcf9;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-light: #999999;
+      --accent: #1a1a1a;
+      --accent-light: #f5f3ef;
+      --border: #e8e5df;
+      --blue: #5B8DC9;
+      --yellow: #F5D76E;
+      --blue-light: #C5DCF2;
+      --blue-mid: #7BA3D0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      --radius: 10px;
+      --max-w: 720px;
+      --max-w-wide: 960px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text); background: var(--bg);
+      line-height: 1.75; font-size: 16px;
+      -webkit-font-smoothing: antialiased; letter-spacing: -0.01em;
+    }
+
+    /* Navigation */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(253,252,249,0.90); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 24px; }
+    nav .nav-inner { max-width: var(--max-w-wide); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+    nav .nav-logo { font-weight: 700; font-size: 17px; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
+    nav .nav-links { display: flex; gap: 24px; }
+    nav .nav-links a { font-size: 13px; font-weight: 500; color: var(--text-light); text-decoration: none; transition: color 0.2s; }
+    nav .nav-links a:hover { color: var(--text); }
+
+    /* Sections */
+    .section { padding: 80px 24px; }
+    .container { max-width: var(--max-w); margin: 0 auto; }
+    .container-wide { max-width: var(--max-w-wide); margin: 0 auto; }
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); margin-bottom: 12px; }
+    .section-title { font-size: 28px; font-weight: 700; line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 16px; }
+    .section-subtitle { font-size: 16px; color: var(--text-muted); line-height: 1.75; max-width: 640px; }
+
+    /* Hero */
+    .hero { padding: 80px 24px 48px; text-align: center; }
+    .hero-title { font-size: 42px; font-weight: 700; line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; }
+    .hero-sub { font-size: 17px; color: var(--text-muted); margin-bottom: 32px; max-width: 620px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .hero-links { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { background: #000; }
+    .btn-outline { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+    .btn-outline:hover { border-color: var(--text); color: var(--text); }
+    .hero-teaser { max-width: var(--max-w-wide); margin: 0 auto; }
+    .hero-teaser img { width: 100%; display: block; border-radius: var(--radius); border: 1px solid var(--border); }
+
+    /* Problem cards */
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
+    .problem-card { padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); }
+    .problem-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .problem-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .x-mark { color: #cc4444; } .check-mark { color: #3d9970; }
+    .insight-box { margin-top: 36px; padding: 24px 28px; border-left: 3px solid var(--text); border-radius: 0 var(--radius) var(--radius) 0; }
+    .insight-box .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); margin-bottom: 8px; }
+    .insight-box p { font-size: 15px; line-height: 1.75; }
+    .insight-box em { font-style: italic; font-weight: 600; }
+
+    /* Method */
+    .method-figure { margin: 36px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .method-figure img { width: 100%; display: block; }
+    .method-figure figcaption { padding: 16px 20px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border); }
+    .method-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; }
+    .method-step { padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); }
+    .method-step .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-light); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-bottom: 12px; border: 1px solid var(--border); }
+    .method-step h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .method-step p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── Generic tab system ── */
+    .tab-bar { display: flex; gap: 4px; background: var(--accent-light); border-radius: 8px; padding: 4px; margin: 24px 0; width: 100%; position: relative; }
+    .tab-bar .tab-slider { position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: var(--text); transition: left 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1); pointer-events: none; z-index: 0; }
+    .tab-btn { flex: 1; padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.25s; border: none; color: var(--text-light); background: transparent; font-family: 'Inter', sans-serif; text-align: center; position: relative; z-index: 1; }
+    .tab-btn.active { color: var(--bg); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* t-SNE */
+    .tsne-section { padding: 80px 24px; }
+    .tsne-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .tsne-canvas-wrap { border-radius: 8px; overflow: hidden; background: transparent; border: 1px solid var(--border); }
+    .tsne-canvas-wrap canvas { width: 100%; aspect-ratio: 16 / 9; display: block; cursor: crosshair; }
+    .tsne-canvas-label { padding: 10px 16px; font-size: 12px; font-weight: 500; background: var(--accent-light); color: var(--text-muted); text-align: center; transition: opacity 0.3s; }
+    .tsne-morph-bar { display: flex; gap: 4px; background: var(--accent-light); border-radius: 8px; padding: 4px; margin: 24px 0; width: 100%; position: relative; }
+    .tsne-morph-bar .morph-slider { position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: var(--text); transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; z-index: 0; }
+    .morph-btn { flex: 1; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: color 0.25s; border: none; color: var(--text-light); background: transparent; font-family: 'Inter', sans-serif; text-align: center; position: relative; z-index: 1; white-space: nowrap; }
+    .morph-btn.active { color: var(--bg); }
+    .legend-bar { display: flex; justify-content: center; gap: 24px; margin-top: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-dot.humanoid { background: #5B8DC9; }
+    .legend-dot.human { background: #F5D76E; }
+    .tsne-tab-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
+    .tsne-conclusion { margin-top: 40px; padding: 24px 28px; background: var(--accent-light); border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; line-height: 1.75; color: var(--text-muted); text-align: center; }
+    .tsne-conclusion strong { color: var(--text); }
+
+    /* Branching layout */
+    .branch-root { margin-top: 48px; }
+    .branch-root-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .branch-connector { display: flex; flex-direction: column; align-items: center; padding: 0; }
+    .branch-stem { width: 2px; height: 32px; background: var(--border); }
+    .branch-label { font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 6px 18px; background: var(--accent-light); border: 1px solid var(--border); border-radius: 20px; white-space: nowrap; text-align: center; }
+    .branch-fork { display: flex; align-items: flex-start; width: 50%; }
+    .branch-arm { flex: 1; height: 32px; }
+    .branch-arm-left { border-top: 2px solid var(--border); border-left: 2px solid var(--border); border-top-left-radius: 12px; }
+    .branch-arm-right { border-top: 2px solid var(--border); border-right: 2px solid var(--border); border-top-right-radius: 12px; }
+    .branch-children { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .branch-child { text-align: center; }
+    .branch-child .tsne-tab-desc { text-align: center; font-size: 13px; max-width: 380px; margin-left: auto; margin-right: auto; }
+    .branch-child .tsne-morph-bar { max-width: 340px; margin-left: auto; margin-right: auto; }
+    .branch-child-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.2px; }
+    .branch-child-title a { color: inherit; text-decoration: none; border-bottom: 1.5px dashed var(--border); padding-bottom: 1px; transition: border-color 0.2s, color 0.2s; }
+    .branch-child-title a:hover { color: var(--blue); border-bottom-color: var(--blue); }
+    .branch-child-title .jump-arrow { font-size: 13px; margin-left: 4px; opacity: 0; transition: opacity 0.2s, transform 0.2s; display: inline-block; }
+    .branch-child-title a:hover .jump-arrow { opacity: 0.6; transform: translateY(1px); }
+    .branch-jump-hint { display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; font-size: 12px; font-weight: 500; color: var(--text-light); text-decoration: none; padding: 5px 14px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.25s; background: transparent; }
+    .branch-jump-hint:hover { color: var(--blue); border-color: var(--blue); background: rgba(91,141,201,0.05); }
+    .branch-jump-hint svg { transition: transform 0.25s; }
+    .branch-jump-hint:hover svg { transform: translateX(2px); }
+
+    /* Noise robustness interactive */
+    .noise-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    .noise-card { padding: 18px 20px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); }
+    .noise-card--unit { border-color: rgba(245,215,110,0.5); background: rgba(245,215,110,0.04); }
+    .noise-card-header { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+    .noise-card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .noise-card-tag { font-size: 10px; font-weight: 400; color: var(--text-light); margin-left: auto; }
+    .noise-card-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin: 8px 0 10px; font-variant-numeric: tabular-nums; color: var(--text); }
+    .noise-card-x { font-size: 20px; font-weight: 600; color: var(--text-muted); }
+    .noise-card-bar-track { height: 4px; border-radius: 2px; background: var(--accent-light); overflow: hidden; }
+    .noise-card-bar { height: 100%; border-radius: 2px; transition: width 0.15s ease-out; }
+    .noise-slider-wrap { margin-top: 20px; text-align: center; }
+    .noise-slider-hint { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--text-light); margin-bottom: 12px; animation: hintPulse 2s ease-in-out infinite; }
+    @keyframes hintPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .noise-slider-hint.hidden { display: none; }
+    .noise-slider-label { font-size: 14px; color: var(--text-muted); display: block; margin-bottom: 10px; }
+    .noise-cards { margin-top: 20px; }
+    .noise-slider-label strong { color: var(--text); font-size: 18px; font-variant-numeric: tabular-nums; }
+    .noise-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--accent-light); outline: none; cursor: pointer; }
+    .noise-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--text); cursor: grab; border: 3px solid var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .noise-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--text); cursor: grab; border: 3px solid var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .noise-slider-ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); margin-top: 4px; padding: 0 2px; }
+
+    /* Video gallery */
+    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .video-card { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #000; }
+    .video-card video { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+    .video-card-instruction { padding: 10px 14px; font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--text-muted); background: var(--accent-light); }
+    .video-card-inner { position: relative; }
+    .droid-wide-card { border-radius: 8px; }
+    .droid-wide-card video { aspect-ratio: 1920 / 384; object-fit: contain; background: #000; }
+    .real-video-card video { aspect-ratio: 4 / 3; object-fit: contain; }
+    .robot-demo-card video { aspect-ratio: 16 / 9; object-fit: contain; }
+    .human-demo-card video { aspect-ratio: 16 / 9; object-fit: contain; }
+    .video-speed-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.3px; backdrop-filter: blur(4px); pointer-events: none; }
+    /* OOD zone-based comparison layout */
+    .ood-layout { display: flex; gap: 12px; justify-content: center; align-items: stretch; }
+    .ood-zone { border-radius: var(--radius); padding: 16px 14px; }
+    .ood-zone--train { background: rgba(91,141,201,0.03); border: 1.5px solid rgba(91,141,201,0.10); }
+    .ood-zone--exec { background: rgba(245,215,110,0.04); border: 1.5px solid rgba(196,144,0,0.15); }
+    .ood-zone-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
+    .ood-zone--train .ood-zone-label { color: rgba(91,141,201,0.50); }
+    .ood-zone--exec .ood-zone-label { color: rgba(184,134,11,0.55); }
+    .ood-zone-cols { display: flex; gap: 14px; align-items: flex-start; }
+    .ood-zone .video-card { background: transparent; }
+    .ood-zone .video-card video { height: 160px; width: auto; display: block; }
+    .ood-zone .col-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-align: center; }
+    .ood-zone .col-desc { font-size: 10px; font-weight: 400; color: var(--text-light); text-align: center; margin-bottom: 10px; line-height: 1.4; text-transform: none; letter-spacing: 0; }
+    .ood-zone--exec .col-desc { visibility: hidden; }
+    .ood-zone .col-label .step-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: 700; margin-right: 5px; vertical-align: middle; }
+    .step-num--ref { background: var(--accent-light); color: var(--text-muted); border: 1.5px solid var(--border); }
+    .step-num--human { background: rgba(245,215,110,0.25); color: #b8860b; border: 1.5px solid rgba(245,215,110,0.5); }
+    .step-num--result { background: var(--text); color: var(--bg); }
+    .ood-zone .video-speed-badge { top: 6px; bottom: auto; font-size: 9px; padding: 2px 7px; }
+    .ood-combi-placeholder { display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px dashed var(--border); background: var(--accent-light); padding: 32px 20px; text-align: center; font-size: 13px; color: var(--text-light); line-height: 1.6; }
+    /* Zone separator arrow */
+    .ood-zone-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; min-width: 48px; gap: 5px; }
+    .ood-arrow-line { width: 100%; height: 0; border-top: 1.5px dashed var(--border); position: relative; }
+    .ood-arrow-line::after { content: ''; position: absolute; right: -1px; top: -4.5px; border-left: 7px solid var(--text-light); border-top: 4px solid transparent; border-bottom: 4px solid transparent; opacity: 0.5; }
+    .ood-arrow-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); white-space: nowrap; background: var(--bg); padding: 2px 10px; border-radius: 10px; border: 1px solid var(--border); }
+
+    /* Results */
+    .result-block { margin-bottom: 56px; }
+    .result-block:last-child { margin-bottom: 0; }
+    .result-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .result-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.7; }
+    .chart-container { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+    .chart-container canvas { max-height: 400px; }
+    .tab-bar[data-tabgroup="perf"] .tab-btn { font-size: 14px; font-weight: 700; padding: 10px 24px; letter-spacing: -0.2px; }
+    .perf-tab-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
+    .inline-result { font-weight: 700; color: var(--text); }
+    .narrative-text { font-size: 16px; line-height: 1.8; margin-bottom: 16px; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th { text-align: left; padding: 12px 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+    .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .best { font-weight: 700; color: var(--text); }
+    .data-table .method-name { font-weight: 600; }
+    .data-table .highlight-row { background: var(--accent-light); }
+
+    /* Video placeholders */
+    .demo-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .demo-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+    .demo-card-header .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .demo-card-header .icon-policy { background: #dbeafe; }
+    .demo-card-header .icon-wm { background: #fef3c7; }
+    .demo-card-header h3 { font-size: 14px; font-weight: 600; }
+    .demo-card-header p { font-size: 12px; color: var(--text-muted); }
+    .demo-card-body { aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: var(--accent-light); color: var(--text-light); font-size: 14px; position: relative; }
+    .video-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px; text-align: center; }
+    .video-placeholder .play-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+    /* Callouts */
+    .callout { padding: 20px 24px; border-radius: var(--radius); margin: 24px 0; font-size: 15px; line-height: 1.7; }
+    .callout-blue { border-left: 3px solid var(--text); }
+
+    /* Citation */
+    .citation-block { background: var(--accent-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; overflow-x: auto; white-space: pre-wrap; color: var(--text-muted); position: relative; }
+    .citation-block .copy-btn { position: absolute; top: 12px; right: 12px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .citation-block .copy-btn:hover { border-color: var(--text); color: var(--text); }
+
+    footer { text-align: center; padding: 40px 24px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-light); }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 32px; }
+      .problem-grid, .method-steps, .tsne-row, .branch-children { grid-template-columns: 1fr; }
+      .video-grid { grid-template-columns: 1fr; }
+      .noise-cards { grid-template-columns: 1fr; }
+      .branch-fork { width: 80%; }
+      .branch-label { white-space: normal; font-size: 12px; }
+      .ood-layout { flex-direction: column; }
+      .ood-zone-cols { flex-direction: column; }
+      .ood-zone-arrow { flex-direction: row; min-width: 0; width: 100%; min-height: 36px; }
+      nav .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">UniT</a>
+    <div class="nav-links">
+      <a href="#problem">Motivation</a>
+      <a href="#method">Method</a>
+      <a href="#unified-space">Unified Space</a>
+      <a href="#policy">Policy</a>
+      <a href="#world-model">World Model</a>
+      <a href="#ablation">Ablation</a>
+      <a href="#noise-robustness">Robustness</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container-wide">
+    <div class="section-label">NeurIPS 2026</div>
+    <h1 class="hero-title">
+      UniT: A Unified Physical Language for<br>
+      Human-to-Humanoid Transfer
+    </h1>
+    <p class="hero-sub">
+      Scaling humanoid foundation models is bottlenecked by scarce robotic data. While massive egocentric human data offers a scalable alternative, bridging the cross-embodiment chasm remains a fundamental challenge. UniT establishes a <strong>unified physical language</strong> — one tokenizer that enables zero-shot transfer for both policy learning and world modeling.
+    </p>
+    <div class="hero-links">
+      <a href="#" class="btn btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Paper
+      </a>
+      <a href="#" class="btn btn-outline">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        Code (Coming Soon)
+      </a>
+    </div>
+    <div class="hero-teaser">
+      <img src="figs/teaser.png" alt="UniT teaser — from human demonstration to humanoid policy and world model">
+    </div>
+  </div>
+</section>
+
+<!-- Hero demo videos -->
+<section class="section" style="padding-top: 0;">
+  <div class="container-wide">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div class="demo-card">
+        <div class="demo-card-header">
+          <div class="icon icon-policy">&#x1F916;</div>
+          <div><h3>Zero-Shot Policy Transfer</h3><p>Human demo &rarr; Humanoid executes unseen task</p></div>
+        </div>
+        <div class="demo-card-body">
+          <div class="video-placeholder"><div class="play-icon">&#x25B6;</div><span>Policy transfer video — stacking with emergent waist rotation</span></div>
+        </div>
+      </div>
+      <div class="demo-card">
+        <div class="demo-card-header">
+          <div class="icon icon-wm">&#x1F30D;</div>
+          <div><h3>Zero-Shot Cross Conditioning</h3><p>Human action &rarr; Humanoid video generation</p></div>
+        </div>
+        <div class="demo-card-body">
+          <div class="video-placeholder"><div class="play-icon">&#x25B6;</div><span>Human-to-robot conditioning — world model generates robot execution</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Motivation -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-label">Motivation</div>
+    <h2 class="section-title">The Human-to-Humanoid Transfer Problem</h2>
+    <p class="section-subtitle">Scaling humanoid foundation models is bottlenecked by scarce robot data. Massive human motion sequences provide a scalable alternative rich in physical interaction priors — but biomechanical and hardware differences create heterogeneous state-action spaces with mismatched degrees of freedom and control paradigms.</p>
+    <div class="problem-grid">
+      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Motion Retargeting</h4><p>Complex kinematic solvers map human motions to specific robots case by case. Labor-intensive, unscalable, and retargeted actions often misalign with the original visual observations.</p></div>
+      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> End-to-End Co-Training</h4><p>Co-training on mixed embodiment data end-to-end forces the model to fit fundamentally different action distributions simultaneously, often leading to embodiment-specific shortcuts rather than shared representations.</p></div>
+      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Action-Only Tokenization</h4><p>Relies exclusively on proprioceptive reconstruction. Without external visual grounding, these representations suffer from severe distribution shifts between humans and robots.</p></div>
+      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Vision-Only Latent Actions</h4><p>Infers intent directly from pixels, bypassing kinematic mismatches. But these representations are prone to entangling low-level appearance confounders (textures, lighting) and leave structural priors of human pose data underexploited.</p></div>
+    </div>
+    <div class="insight-box">
+      <div class="label">Our Key Insight</div>
+      <p>While human and humanoid kinematics differ in structural DoFs and contain embodiment-specific noise, <em>the physical outcomes of their intents share a consistent visual representation</em>. Visual observations can therefore serve as a <em>universal anchor</em> to ground and align disparate kinematic spaces — filtering out visually unobservable artifacts while preserving embodiment-agnostic physical intent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Method -->
+<section class="section" id="method">
+  <div class="container-wide">
+    <div class="section-label">Method</div>
+    <h2 class="section-title">Visual Anchoring via Cross-Reconstruction</h2>
+    <p class="section-subtitle">UniT functions as a cross-modal information bottleneck: it concurrently extracts temporal-visual, kinematic, and fused visuo-motor features, and enforces rigorous cross-reconstruction to distill the embodiment-agnostic physical intent.</p>
+    <figure class="method-figure">
+      <video src="method.mp4" autoplay loop muted playsinline style="width: 100%; display: block;"></video>
+      <figcaption><strong>Architecture of UniT.</strong> Cross-embodiment vision pairs (O<sub>t</sub>, O<sub>t+k</sub>) and action chunks A<sub>t:t+k</sub> are encoded into vision, action, and fused features via tri-branch encoders. A shared RQ-VAE codebook quantizes all three branches into a unified discrete space. Both vision and action decoders reconstruct from these shared tokens, enforcing cross-reconstruction alignment.</figcaption>
+    </figure>
+    <div class="method-steps">
+      <div class="method-step"><div class="step-num">1</div><h4>Tri-Branch Encoding</h4><p>A <strong>visual branch</strong> (IDM on frozen DINOv2 features) captures physical transitions; an <strong>action branch</strong> encodes embodiment-specific state and action chunks via per-embodiment MLPs; a <strong>fusion branch</strong> integrates both into a compact visuo-motor representation.</p></div>
+      <div class="method-step"><div class="step-num">2</div><h4>Cross-Reconstruction</h4><p>Every quantized token is decoded by <strong>both</strong> a visual decoder (FDM) and an action decoder. By forcing kinematic features to reconstruct visual transitions, heterogeneous actions are anchored to their physical consequences. Uncorrelated noise from either domain is discarded.</p></div>
+      <div class="method-step"><div class="step-num">3</div><h4>Two Deployment Modes</h4><p><strong>VLA-UniT</strong> predicts fusion-branch tokens as a structured cross-embodiment learning objective for VLMs. <strong>WM-UniT</strong> uses action-branch features as a universal conditioning interface for video generation.</p></div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1.093fr 1fr; gap: 24px; margin-top: 36px;">
+      <figure class="method-figure" style="margin: 0;">
+        <img src="method_vla.png" alt="VLA-UniT" style="width: 100%; display: block;">
+        <figcaption><strong>(a) VLA-UniT.</strong> Rather than direct action regression, the VLM predicts Unified Latent Action tokens in the shared space via cross-entropy. A lightweight flow-matching action expert generates embodiment-specific controls from the same vision-language context.</figcaption>
+      </figure>
+      <figure class="method-figure" style="margin: 0;">
+        <img src="method_wm.png" alt="WM-UniT" style="width: 100%; display: block;">
+        <figcaption><strong>(b) WM-UniT.</strong> Continuous pre-quantization features from the UniT action branch are projected and injected via cross-attention, providing embodiment-agnostic action conditions for autoregressive video generation.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ Unified Space (t-SNE) — horizontal tabs ═══════ -->
+<section class="tsne-section" id="unified-space">
+  <div class="container-wide">
+    <div class="section-label">The Unified Space</div>
+    <h2 class="section-title">Does UniT Actually Create a Shared Manifold?</h2>
+    <p class="section-subtitle">We perform t-SNE analysis on human (EgoDex) and humanoid (RoboCasa GR1) samples to verify that UniT establishes a unified physical language — and that this alignment propagates into both downstream model internals.</p>
+    <!-- ── Layer 1: Token-Level (root) ── -->
+    <div class="branch-root">
+      <h3 class="branch-root-title">Representation Alignment</h3>
+      <p class="tsne-tab-desc">In the raw action space, human and humanoid data form <strong style="color:var(--text)">clearly separated clusters</strong> reflecting the inherent distribution gap between heterogeneous kinematics. After encoding through UniT, the visual-anchored cross-reconstruction successfully projects disparate action spaces into a <strong style="color:var(--text)">shared manifold</strong>.</p>
+      <div class="tsne-morph-bar">
+        <button class="morph-btn active" data-morph-canvas="tsne-morph-token" data-morph-state="baseline">Raw Action</button>
+        <button class="morph-btn" data-morph-canvas="tsne-morph-token" data-morph-state="unit">UniT Tokens</button>
+      </div>
+      <div class="tsne-canvas-wrap"><canvas id="tsne-morph-token"></canvas><div class="tsne-canvas-label" id="label-tsne-morph-token">Raw Action Space — separated clusters</div></div>
+    </div>
+
+    <!-- ── Branching connector ── -->
+    <div class="branch-connector">
+      <div class="branch-stem"></div>
+      <div class="branch-label">Alignment propagates into downstream model internals</div>
+      <div class="branch-fork">
+        <div class="branch-arm branch-arm-left"></div>
+        <div class="branch-arm branch-arm-right"></div>
+      </div>
+    </div>
+
+    <!-- ── Layer 2: Two downstream branches side by side ── -->
+    <div class="branch-children">
+      <div class="branch-child">
+        <h3 class="branch-child-title"><a href="#policy">Policy Learning<span class="jump-arrow">&#8599;</span></a></h3>
+        <p class="tsne-tab-desc">Mean-pooled last-layer vision-language features. The vanilla VLA maintains <strong style="color:var(--text)">separated</strong> human/humanoid distributions, while VLA-UniT produces <strong style="color:var(--text)">interleaved</strong> representations.</p>
+        <div class="tsne-morph-bar">
+          <button class="morph-btn active" data-morph-canvas="tsne-morph-vla" data-morph-state="baseline">GR00T-Qwen2.5</button>
+          <button class="morph-btn" data-morph-canvas="tsne-morph-vla" data-morph-state="unit">VLA-UniT</button>
+        </div>
+        <div class="tsne-canvas-wrap"><canvas id="tsne-morph-vla"></canvas><div class="tsne-canvas-label" id="label-tsne-morph-vla">GR00T-Qwen2.5 — separated VLM features</div></div>
+        <a href="#policy" class="branch-jump-hint">See experiments <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg></a>
+      </div>
+      <div class="branch-child">
+        <h3 class="branch-child-title"><a href="#world-model">World Modelling<span class="jump-arrow">&#8599;</span></a></h3>
+        <p class="tsne-tab-desc">Mean-pooled last-layer cross-attention outputs. The vanilla WM exhibits <strong style="color:var(--text)">fully disjoint</strong> clusters, whereas WM-UniT brings them into a <strong style="color:var(--text)">single unified</strong> distribution.</p>
+        <div class="tsne-morph-bar">
+          <button class="morph-btn active" data-morph-canvas="tsne-morph-wm" data-morph-state="baseline">Cosmos Predict 2.5 Action-Cond.</button>
+          <button class="morph-btn" data-morph-canvas="tsne-morph-wm" data-morph-state="unit">WM-UniT</button>
+        </div>
+        <div class="tsne-canvas-wrap"><canvas id="tsne-morph-wm"></canvas><div class="tsne-canvas-label" id="label-tsne-morph-wm">Cosmos Predict 2.5 Action-Conditioned — disjoint cross-attention features</div></div>
+        <a href="#world-model" class="branch-jump-hint">See experiments <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg></a>
+      </div>
+    </div>
+
+    <div class="tsne-conclusion">UniT tokens not only form a shared cross-embodiment latent space, but also induce <strong>two fundamentally different downstream architectures</strong> — a VLM for policy learning and a DiT for world modeling — to develop embodiment-agnostic internal representations. This alignment <strong>emerges from the tokenizer</strong>, providing the structural basis for cross-embodiment transfer.</div>
+  </div>
+</section>
+
+<!-- Policy Results -->
+<section class="section" id="policy">
+  <div class="container-wide">
+    <div class="section-label">Downstream Paradigm I</div>
+    <h2 class="section-title">Policy Learning: From Data Efficiency to Zero-Shot Transfer</h2>
+    <p class="section-subtitle">UniT token prediction provides the VLM with a compact, visually-anchored learning objective that encodes physical intent. We evaluate on the RoboCasa GR1 benchmark (24 tabletop tasks, 50 episodes each) and a real-world full-body humanoid (IRON-R01-1.11, 50-DoF).</p>
+
+    <!-- Benchmark + Data Efficiency — tab switched -->
+    <div class="result-block" style="margin-top: 48px;">
+      <div class="tab-bar" data-tabgroup="perf">
+        <button class="tab-btn active" data-tab="perf-bench">Benchmark Performance</button>
+        <button class="tab-btn" data-tab="perf-eff">10x Data Efficiency</button>
+      </div>
+      <div class="tab-panel active" data-tabgroup="perf" data-tab="perf-bench">
+        <p class="perf-tab-desc">VLA-UniT achieves <span class="inline-result">66.7%</span> overall success rate on RoboCasa GR1, surpassing FLARE (<span class="inline-result">+11.7%</span>) and the GR00T baseline (<span class="inline-result">+18.9%</span>).</p>
+        <div class="chart-container"><canvas id="chart-benchmark"></canvas></div>
+      </div>
+      <div class="tab-panel" data-tabgroup="perf" data-tab="perf-eff">
+        <p class="perf-tab-desc">With only <strong>10%</strong> of training data, VLA-UniT (<span class="inline-result">45.5%</span>) already approaches GR00T trained on full data (<span class="inline-result">47.8%</span>).</p>
+        <div class="chart-container"><canvas id="chart-efficiency"></canvas></div>
+      </div>
+
+      <!-- Policy Videos -->
+      <div style="margin-top: 32px;">
+        <div class="tab-bar" data-tabgroup="policy-videos">
+          <button class="tab-btn active" data-tab="pv-articulated">Articulated</button>
+          <button class="tab-btn" data-tab="pv-pnp">Pick and Place</button>
+        </div>
+        <div class="tab-panel active" data-tabgroup="policy-videos" data-tab="pv-articulated">
+          <div class="video-grid">
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/articulated_cup_drawer.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick up the cup, place it into the drawer and close the drawer</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/articulated_milk_microwave.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick up the milk, place it into the microwave and close the microwave</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/articulated_wine_cabinet.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick up the wine, place it into the cabinet and close the cabinet</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="policy-videos" data-tab="pv-pnp">
+          <div class="video-grid">
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/pnp_bellpepper_shelf.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the bell pepper from the tray and place it in the tiered shelf</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/pnp_can_box.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the can from the plate and place it in the cardboard box</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/web/pnp_cupcake_basket.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the cupcake from the cutting board and place it in the tiered basket</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Human Data -->
+    <div class="result-block">
+      <h3 class="result-title">Human Data Unlocks Generalization</h3>
+      <p class="result-desc">Under the few-shot regime, we co-train VLA-UniT on robot data and EgoDex human demonstrations (27,419 pick-and-place trajectories), then fine-tune on robot data alone. Human data brings consistent improvements across both in-domain and all three OOD scenarios.</p>
+      <div class="chart-container"><canvas id="chart-human-data"></canvas></div>
+      <div style="margin-top: 32px;">
+        <div class="tab-bar" data-tabgroup="ood-videos">
+          <button class="tab-btn active" data-tab="ood-appear">Unseen Appearance</button>
+          <button class="tab-btn" data-tab="ood-combs">Unseen Combinations</button>
+          <button class="tab-btn" data-tab="ood-objtype">Unseen Object Types</button>
+        </div>
+        <div class="tab-panel active" data-tabgroup="ood-videos" data-tab="ood-appear">
+          <div class="video-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-1-1.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the bell pepper from the cutting board and place it in the basket</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-1-2.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the croissant from the cutting board and place it in the cardboard box</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="ood-videos" data-tab="ood-combs">
+          <div class="video-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-2-1.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick up the wine, place it into the drawer and close the drawer</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-2-2.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the sweet potato from the placemat and place it in the pot</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="ood-videos" data-tab="ood-objtype">
+          <div class="video-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-3-1.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the rubix cube from the placemat and place it in the pan</div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-inner">
+                <video src="movies/robocasa/ood/web/ood-3-2.mp4" autoplay muted loop playsinline></video>
+                <div class="video-speed-badge">Autonomous 2.0x</div>
+              </div>
+              <div class="video-card-instruction">Pick the fish from the placemat and place it in the pot</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-World — tabbed -->
+    <div class="result-block">
+      <h3 class="result-title">Real-World Deployment</h3>
+      <p class="result-desc">Deployed on IRON-R01-1.11 humanoid (50-DoF) with two tasks: Pick &amp; Place (analogous to EgoDex basic_pick_place) and Pouring (bimanual). Five OOD axes test geometry, distractor, target, background, and combinational generalization.</p>
+      <div class="tab-bar" data-tabgroup="real">
+        <button class="tab-btn active" data-tab="real-indomain">In-Domain</button>
+        <button class="tab-btn" data-tab="real-ood">OOD Generalization</button>
+      </div>
+      <div class="tab-panel active" data-tabgroup="real" data-tab="real-indomain">
+        <div class="chart-container"><canvas id="chart-real-indomain"></canvas></div>
+        <div style="margin-top: 32px;">
+          <div class="tab-bar" data-tabgroup="real-id-videos">
+            <button class="tab-btn active" data-tab="real-id-pnp">Pick and Place</button>
+            <button class="tab-btn" data-tab="real-id-pour">Pour</button>
+          </div>
+          <div class="tab-panel active" data-tabgroup="real-id-videos" data-tab="real-id-pnp">
+            <div class="video-grid" style="grid-template-columns: repeat(2, 1fr);">
+              <div class="video-card real-video-card">
+                <div class="video-card-inner">
+                  <video src="movies/real/id/banana.mp4" autoplay muted loop playsinline></video>
+                  <div class="video-speed-badge">Autonomous 2.0x</div>
+                </div>
+                <div class="video-card-instruction">Put the banana in the box</div>
+              </div>
+              <div class="video-card real-video-card">
+                <div class="video-card-inner">
+                  <video src="movies/real/id/bowl.mp4" autoplay muted loop playsinline></video>
+                  <div class="video-speed-badge">Autonomous 2.0x</div>
+                </div>
+                <div class="video-card-instruction">Put the bowl in the box</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" data-tabgroup="real-id-videos" data-tab="real-id-pour">
+            <div class="video-grid">
+              <div class="video-card real-video-card">
+                <div class="video-card-inner">
+                  <video src="movies/real/id/pour-1.mp4" autoplay muted loop playsinline></video>
+                  <div class="video-speed-badge">Autonomous 2.0x</div>
+                </div>
+                <div class="video-card-instruction">Pour contents from the bottle into the cup</div>
+              </div>
+              <div class="video-card real-video-card">
+                <div class="video-card-inner">
+                  <video src="movies/real/id/pour-2.mp4" autoplay muted loop playsinline></video>
+                  <div class="video-speed-badge">Autonomous 2.0x</div>
+                </div>
+                <div class="video-card-instruction">Pour contents from the bottle into the cup</div>
+              </div>
+              <div class="video-card real-video-card">
+                <div class="video-card-inner">
+                  <video src="movies/real/id/pour-3.mp4" autoplay muted loop playsinline></video>
+                  <div class="video-speed-badge">Autonomous 2.0x</div>
+                </div>
+                <div class="video-card-instruction">Pour contents from the bottle into the cup</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" data-tabgroup="real" data-tab="real-ood">
+        <div class="chart-container"><canvas id="chart-real-ood"></canvas></div>
+        <div style="margin-top: 32px;">
+          <div class="tab-bar" data-tabgroup="real-ood-videos">
+            <button class="tab-btn active" data-tab="ood-geo">Geometry</button>
+            <button class="tab-btn" data-tab="ood-distractor">Distractor</button>
+            <button class="tab-btn" data-tab="ood-target">Target</button>
+            <button class="tab-btn" data-tab="ood-bg">Background</button>
+            <button class="tab-btn" data-tab="ood-combi">Combinational</button>
+          </div>
+
+          <!-- Background (ood4) -->
+          <div class="tab-panel" data-tabgroup="real-ood-videos" data-tab="ood-bg">
+            <div class="ood-layout">
+              <div class="ood-zone ood-zone--train">
+                <div class="ood-zone-label">Training Coverage</div>
+                <div class="ood-zone-cols">
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--ref">1</span>Robot Demo</div>
+                    <div class="col-desc">Trained on standard setting</div>
+                    <div class="video-card robot-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-banana.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the banana in the box</div>
+                    </div>
+                    <div class="video-card robot-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-bowl-1.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the bowl in the box</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--human">2</span>Human Demo</div>
+                    <div class="col-desc">Demonstrates OOD variation</div>
+                    <div class="video-card human-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-banana-back.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (banana)</div>
+                    </div>
+                    <div class="video-card human-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-bowl-back.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (bowl)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ood-zone-arrow"><div class="ood-arrow-line"></div><div class="ood-arrow-label">UniT Transfer</div></div>
+              <div class="ood-zone ood-zone--exec">
+                <div class="ood-zone-label">Zero-Shot Execution</div>
+                <div>
+                  <div class="col-label"><span class="step-num step-num--result">3</span>OOD: Background</div>
+                  <div class="col-desc">&nbsp;</div>
+                  <div class="video-card real-video-card">
+                    <div class="video-card-inner"><video src="movies/real/ood/banana-ood4.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the banana in the box</div>
+                  </div>
+                  <div class="video-card real-video-card" style="margin-top: 12px;">
+                    <div class="video-card-inner"><video src="movies/real/ood/bowl-ood4.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the bowl in the box</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Target (ood2) -->
+          <div class="tab-panel" data-tabgroup="real-ood-videos" data-tab="ood-target">
+            <div class="ood-layout">
+              <div class="ood-zone ood-zone--train">
+                <div class="ood-zone-label">Training Coverage</div>
+                <div class="ood-zone-cols">
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--ref">1</span>Robot Demo</div>
+                    <div class="col-desc">Trained on standard setting</div>
+                    <div class="video-card robot-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-banana.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the banana in the box</div>
+                    </div>
+                    <div class="video-card robot-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-bowl-1.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the bowl in the box</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--human">2</span>Human Demo</div>
+                    <div class="col-desc">Demonstrates OOD variation</div>
+                    <div class="video-card human-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-banana-target.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (banana)</div>
+                    </div>
+                    <div class="video-card human-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-bowl-target.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (bowl)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ood-zone-arrow"><div class="ood-arrow-line"></div><div class="ood-arrow-label">UniT Transfer</div></div>
+              <div class="ood-zone ood-zone--exec">
+                <div class="ood-zone-label">Zero-Shot Execution</div>
+                <div>
+                  <div class="col-label"><span class="step-num step-num--result">3</span>OOD: Target</div>
+                  <div class="col-desc">&nbsp;</div>
+                  <div class="video-card real-video-card">
+                    <div class="video-card-inner"><video src="movies/real/ood/banana-ood2.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the banana in the blue bowl</div>
+                  </div>
+                  <div class="video-card real-video-card" style="margin-top: 12px;">
+                    <div class="video-card-inner"><video src="movies/real/ood/bowl-ood2.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the bowl on the red plate</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distractor (ood1) -->
+          <div class="tab-panel" data-tabgroup="real-ood-videos" data-tab="ood-distractor">
+            <div class="ood-layout">
+              <div class="ood-zone ood-zone--train">
+                <div class="ood-zone-label">Training Coverage</div>
+                <div class="ood-zone-cols">
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--ref">1</span>Robot Demo</div>
+                    <div class="col-desc">Trained on standard setting</div>
+                    <div class="video-card robot-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-banana.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the banana in the box</div>
+                    </div>
+                    <div class="video-card robot-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-bowl-1.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the bowl in the box</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--human">2</span>Human Demo</div>
+                    <div class="col-desc">Demonstrates OOD variation</div>
+                    <div class="video-card human-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-banana-dis.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (banana)</div>
+                    </div>
+                    <div class="video-card human-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-bowl-dis.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (bowl)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ood-zone-arrow"><div class="ood-arrow-line"></div><div class="ood-arrow-label">UniT Transfer</div></div>
+              <div class="ood-zone ood-zone--exec">
+                <div class="ood-zone-label">Zero-Shot Execution</div>
+                <div>
+                  <div class="col-label"><span class="step-num step-num--result">3</span>OOD: Distractor</div>
+                  <div class="col-desc">&nbsp;</div>
+                  <div class="video-card real-video-card">
+                    <div class="video-card-inner"><video src="movies/real/ood/banana-ood1.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the banana in the box</div>
+                  </div>
+                  <div class="video-card real-video-card" style="margin-top: 12px;">
+                    <div class="video-card-inner"><video src="movies/real/ood/bowl-ood1.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the bowl in the box</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Geometry (ood3) -->
+          <div class="tab-panel active" data-tabgroup="real-ood-videos" data-tab="ood-geo">
+            <div class="ood-layout">
+              <div class="ood-zone ood-zone--train">
+                <div class="ood-zone-label">Training Coverage</div>
+                <div class="ood-zone-cols">
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--ref">1</span>Robot Demo</div>
+                    <div class="col-desc">Trained on standard setting</div>
+                    <div class="video-card robot-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-banana.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the bread in the box</div>
+                    </div>
+                    <div class="video-card robot-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/robot_demo/robot-bowl-1.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Put the cup in the box</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--human">2</span>Human Demo</div>
+                    <div class="col-desc">Demonstrates OOD variation</div>
+                    <div class="video-card human-demo-card">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-banana-geo.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (bread)</div>
+                    </div>
+                    <div class="video-card human-demo-card" style="margin-top: 12px;">
+                      <div class="video-card-inner"><video src="movies/real/human_demo/human-bowl-geo.mp4" autoplay muted loop playsinline></video></div>
+                      <div class="video-card-instruction">Human demonstration (cup)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ood-zone-arrow"><div class="ood-arrow-line"></div><div class="ood-arrow-label">UniT Transfer</div></div>
+              <div class="ood-zone ood-zone--exec">
+                <div class="ood-zone-label">Zero-Shot Execution</div>
+                <div>
+                  <div class="col-label"><span class="step-num step-num--result">3</span>OOD: Geometry</div>
+                  <div class="col-desc">&nbsp;</div>
+                  <div class="video-card real-video-card">
+                    <div class="video-card-inner"><video src="movies/real/ood/banana-ood3.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the bread in the box</div>
+                  </div>
+                  <div class="video-card real-video-card" style="margin-top: 12px;">
+                    <div class="video-card-inner"><video src="movies/real/ood/bowl-ood3.mp4" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                    <div class="video-card-instruction">Put the cup in the box</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Combinational (instruction following — 3-column) -->
+          <div class="tab-panel" data-tabgroup="real-ood-videos" data-tab="ood-combi">
+            <div class="ood-layout">
+              <div class="ood-zone ood-zone--train">
+                <div class="ood-zone-label">Training Coverage</div>
+                <div>
+                  <div class="col-label"><span class="step-num step-num--ref">1</span>Robot Demo</div>
+                  <div class="video-card robot-demo-card">
+                    <div class="video-card-inner"><video src="movies/real/robot_demo/robot-bowl-1.mp4" autoplay muted loop playsinline></video></div>
+                    <div class="video-card-instruction">Put the bowl in the box</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ood-zone-arrow"><div class="ood-arrow-line"></div><div class="ood-arrow-label">Zero-Shot</div></div>
+              <div class="ood-zone ood-zone--exec">
+                <div class="ood-zone-label">Combinational Execution</div>
+                <div class="ood-zone-cols">
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--result">2</span>Unseen Object</div>
+                    <div class="video-card real-video-card">
+                      <div class="video-card-inner"><video src="movies/real/ood/comb-1.mov" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                      <div class="video-card-instruction">Put the cup in the box</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="col-label"><span class="step-num step-num--result">3</span>Unseen Setting</div>
+                    <div class="video-card real-video-card">
+                      <div class="video-card-inner"><video src="movies/real/ood/comb-2.mov" autoplay muted loop playsinline></video><div class="video-speed-badge">Autonomous 4x</div></div>
+                      <div class="video-card-instruction">Put the bowl in the box</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Zero-Shot -->
+    <div class="result-block">
+      <h3 class="result-title">Zero-Shot Task Transfer</h3>
+      <p class="narrative-text">We evaluate on a stacking task that is <strong>not covered by robot training demonstrations</strong>. Robot data only include pick-and-place of individual bowls, while EgoDex human videos contain stacking sequences performed with view switching and upper-body coordination.</p>
+      <div class="chart-container"><canvas id="chart-zero-shot"></canvas></div>
+      <div class="callout callout-blue"><strong>Emergent Coordination.</strong> With human co-training, VLA-UniT reaches 60%, transferring not just task semantics but fine-grained coordination patterns: the humanoid exhibited <em>unprogrammed</em> waist rotation and head turning that directly mirror human demonstrations.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ World Model Results — tabbed ═══════ -->
+<section class="section" id="world-model">
+  <div class="container-wide">
+    <div class="section-label">Downstream Paradigm II</div>
+    <h2 class="section-title">World Modeling: From Controllability to Cross-Embodiment Imagination</h2>
+    <p class="section-subtitle">WM-UniT conditions video generation on UniT's continuous pre-quantization features, providing a visually-grounded conditioning interface that replaces embodiment-specific raw actions. Evaluated via 10-step autoregressive rollouts over 10-second video generation.</p>
+
+    <!-- DROID single-embodiment -->
+    <div class="result-block" style="margin-top: 40px;">
+      <h3 class="result-title">Single-Embodiment Controllability (DROID)</h3>
+      <p class="result-desc">WM-UniT achieves the strongest controllability on DROID (best EPE) while improving PSNR, SSIM, and LPIPS. WM-Action does not yield a similarly reliable gain, indicating that latent tokenization alone is insufficient — visual anchoring is the key factor.</p>
+      <div class="chart-container" style="overflow-x: auto;">
+        <table class="data-table">
+          <thead><tr><th>Method</th><th>PSNR &#x2191;</th><th>SSIM &#x2191;</th><th>LPIPS &#x2193;</th><th>FVD &#x2193;</th><th>EPE &#x2193;</th></tr></thead>
+          <tbody>
+            <tr><td class="method-name">Raw Action</td><td style="text-decoration:underline;">21.02</td><td style="text-decoration:underline;">0.820</td><td style="text-decoration:underline;">0.097</td><td class="best">76.38</td><td>0.2662</td></tr>
+            <tr><td class="method-name">WM-Action</td><td>20.86</td><td>0.819</td><td>0.102</td><td>80.30</td><td style="text-decoration:underline;">0.2593</td></tr>
+            <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT</td><td class="best">21.32</td><td class="best">0.823</td><td class="best">0.095</td><td style="text-decoration:underline;">76.44</td><td class="best">0.2588</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 32px;">
+        <div class="tab-bar" data-tabgroup="droid-cases">
+          <button class="tab-btn active" data-tab="droid-case1">Case 1</button>
+          <button class="tab-btn" data-tab="droid-case2">Case 2</button>
+          <button class="tab-btn" data-tab="droid-case3">Case 3</button>
+          <button class="tab-btn" data-tab="droid-case4">Case 4</button>
+        </div>
+        <div class="tab-panel active" data-tabgroup="droid-cases" data-tab="droid-case1">
+          <div class="video-card droid-wide-card">
+            <div class="video-card-inner">
+              <video src="movies/droid/Droid-eg-1-1.mp4" autoplay muted loop playsinline></video>
+              <div class="video-speed-badge">10x Rollout</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="droid-cases" data-tab="droid-case2">
+          <div class="video-card droid-wide-card">
+            <div class="video-card-inner">
+              <video src="movies/droid/droid-eg-3-1.mp4" autoplay muted loop playsinline></video>
+              <div class="video-speed-badge">10x Rollout</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="droid-cases" data-tab="droid-case3">
+          <div class="video-card droid-wide-card">
+            <div class="video-card-inner">
+              <video src="movies/droid/Droid-eg-2-1.mp4" autoplay muted loop playsinline></video>
+              <div class="video-speed-badge">10x Rollout</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tabgroup="droid-cases" data-tab="droid-case4">
+          <div class="video-card droid-wide-card">
+            <div class="video-card-inner">
+              <video src="movies/droid/droid-eg-4-1.mp4" autoplay muted loop playsinline></video>
+              <div class="video-speed-badge">10x Rollout</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Human-Humanoid Co-Training + Pre-training -->
+    <div class="result-block">
+      <h3 class="result-title">Human-Humanoid Co-Training &amp; Pre-Training</h3>
+      <p class="result-desc">UniT provides a shared conditioning space that supports cross-embodiment dynamics modeling. Co-training on EgoDex and RoboCasa-GR1 consistently outperforms raw actions on both subsets. Pre-training on EgoDex human demonstrations further transfers physical dynamics to humanoid prediction.</p>
+      <div class="tab-bar" data-tabgroup="wm-cotrain" style="margin-top: 16px;">
+        <button class="tab-btn active" data-tab="wm-co">Human-Humanoid Co-Training</button>
+        <button class="tab-btn" data-tab="wm-pre">Human Pre-Training</button>
+      </div>
+      <div class="tab-panel active" data-tabgroup="wm-cotrain" data-tab="wm-co">
+        <div class="chart-container" style="overflow-x: auto;">
+          <table class="data-table">
+            <thead><tr><th>Dataset</th><th>Method</th><th>PSNR &#x2191;</th><th>SSIM &#x2191;</th><th>LPIPS &#x2193;</th><th>FVD &#x2193;</th><th>EPE &#x2193;</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="2" class="method-name">EgoDex</td><td>Raw Action</td><td>24.84</td><td>0.800</td><td>0.164</td><td>171.37</td><td>0.706</td></tr>
+              <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT</td><td class="best">28.06</td><td class="best">0.858</td><td class="best">0.086</td><td class="best">130.87</td><td class="best">0.519</td></tr>
+              <tr style="height:4px;"><td colspan="7" style="border:none;"></td></tr>
+              <tr><td rowspan="2" class="method-name">RoboCasa-GR1</td><td>Raw Action</td><td>13.45</td><td>0.590</td><td>0.259</td><td>237.13</td><td>0.558</td></tr>
+              <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT</td><td class="best">17.66</td><td class="best">0.718</td><td class="best">0.142</td><td class="best">166.50</td><td class="best">0.453</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-panel" data-tabgroup="wm-cotrain" data-tab="wm-pre">
+        <div class="chart-container" style="overflow-x: auto;">
+          <table class="data-table">
+            <thead><tr><th>Configuration</th><th>PSNR &#x2191;</th><th>SSIM &#x2191;</th><th>LPIPS &#x2193;</th><th>FVD &#x2193;</th><th>EPE &#x2193;</th></tr></thead>
+            <tbody>
+              <tr><td class="method-name">WM-UniT w/o Human Pre-training</td><td>16.34</td><td>0.678</td><td>0.168</td><td>180.51</td><td>0.478</td></tr>
+              <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT (Full)</td><td class="best">18.06</td><td class="best">0.713</td><td class="best">0.135</td><td class="best">153.31</td><td class="best">0.446</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cross-Embodiment Conditioning Evaluation -->
+    <div class="result-block">
+      <h3 class="result-title">Cross-Embodiment Conditioning Consistency</h3>
+      <p class="result-desc">We directly test whether UniT tokens from one embodiment can condition video generation for the other — without any domain-specific adaptation. Gemini-3-Pro scores semantic, temporal, and geometric consistency (1–5). UniT preserves fine-grained action semantics, magnitude sensitivity, and temporal coherence across embodiments.</p>
+      <div class="chart-container" style="overflow-x: auto;">
+        <table class="data-table">
+          <thead><tr><th>Direction</th><th>Method</th><th>Semantic &#x2191;</th><th>Temporal &#x2191;</th><th>Geometric &#x2191;</th><th>Overall &#x2191;</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2" class="method-name">Robot &#x2192; Human</td><td>Raw Action</td><td>2.96</td><td>3.12</td><td>2.74</td><td>2.92</td></tr>
+            <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT</td><td class="best">3.91</td><td class="best">3.98</td><td class="best">3.66</td><td class="best">3.84</td></tr>
+            <tr style="height:8px;"><td colspan="6" style="border:none;"></td></tr>
+            <tr><td rowspan="2" class="method-name">Human &#x2192; Robot</td><td>Raw Action</td><td>2.98</td><td>3.16</td><td>2.72</td><td>2.95</td></tr>
+            <tr class="highlight-row"><td class="method-name" style="font-weight:700;color:var(--blue);">WM-UniT</td><td class="best">3.28</td><td class="best">3.43</td><td class="best">3.09</td><td class="best">3.27</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ Ablation — tabbed ═══════ -->
+<section class="section" id="ablation">
+  <div class="container-wide">
+    <div class="section-label">Analysis</div>
+    <h2 class="section-title">Every Design Choice Matters</h2>
+    <p class="section-subtitle">We validate two key claims: (1) both vision and action are needed, and (2) the two modalities must be explicitly aligned through cross-reconstruction. Ablation under the human-humanoid co-training setup (EgoDex + RoboCasa pre-train, RoboCasa fine-tune).</p>
+
+    <div class="tab-bar" data-tabgroup="ablation" style="margin-top: 32px;">
+      <button class="tab-btn active" data-tab="abl-ood">OOD Performance</button>
+      <button class="tab-btn" data-tab="abl-indomain">In-Domain</button>
+    </div>
+
+    <div class="tab-panel active" data-tabgroup="ablation" data-tab="abl-ood">
+      <div class="chart-container"><canvas id="chart-ablation-ood"></canvas></div>
+      <div class="callout callout-blue"><strong>Cross-Reconstruction Is Essential.</strong> Removing cross-reconstruction drops OOD from 49.9% to 30.3% — below even single-modality variants — showing that multi-modal input alone does not guarantee alignment. The 19.6% gain confirms explicit cross-modal alignment is the key enabler for human-to-humanoid transfer.</div>
+    </div>
+
+    <div class="tab-panel" data-tabgroup="ablation" data-tab="abl-indomain">
+      <div class="chart-container"><canvas id="chart-ablation-indomain"></canvas></div>
+      <div class="callout callout-blue"><strong>Bidirectional Cross-Reconstruction.</strong> VLA-UniT (66.8%) outperforms VLA-Villa (63.1%), which uses unidirectional V2A reconstruction, confirming that bidirectional alignment is more effective.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ Noise Robustness — interactive ═══════ -->
+<section class="section" id="noise-robustness">
+  <div class="container-wide">
+    <div class="section-label">Robustness</div>
+    <h2 class="section-title">Noise Robustness: Visual Anchoring as a Denoiser</h2>
+    <p class="section-subtitle">In-the-wild human motion capture data inevitably contains noise from sensor jitter and annotation artifacts. Drag the slider to inject Gaussian noise into EgoDex action trajectories and watch how each tokenizer degrades.</p>
+
+    <!-- Chart -->
+    <div class="chart-container" style="margin-top: 32px;"><canvas id="chart-noise-degradation"></canvas></div>
+
+    <!-- Sigma slider -->
+    <div class="noise-slider-wrap">
+      <div class="noise-slider-hint" id="noise-drag-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8L22 12L18 16"/><path d="M6 8L2 12L6 16"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        Drag to adjust noise level
+      </div>
+      <label class="noise-slider-label">Noise Level &sigma; = <strong id="sigma-display">0.00</strong></label>
+      <input type="range" id="sigma-slider" class="noise-slider" min="0" max="50" value="0" step="1">
+      <div class="noise-slider-ticks"><span>0</span><span>0.1</span><span>0.2</span><span>0.3</span><span>0.5</span></div>
+    </div>
+
+    <!-- Scoreboard cards -->
+    <div class="noise-cards">
+      <div class="noise-card noise-card--unit">
+        <div class="noise-card-header">
+          <span class="noise-card-dot" style="background:#F5D76E"></span>UniT <span class="noise-card-tag">vision + action</span>
+        </div>
+        <div class="noise-card-value" id="nc-unit">1.0<span class="noise-card-x">&times;</span></div>
+        <div class="noise-card-bar-track"><div class="noise-card-bar" id="ncbar-unit" style="width:0%;background:#F5D76E"></div></div>
+      </div>
+      <div class="noise-card">
+        <div class="noise-card-header">
+          <span class="noise-card-dot" style="background:#7BA3D0"></span>Action-Only <span class="noise-card-tag">same arch, no vision</span>
+        </div>
+        <div class="noise-card-value" id="nc-action">1.0<span class="noise-card-x">&times;</span></div>
+        <div class="noise-card-bar-track"><div class="noise-card-bar" id="ncbar-action" style="width:0%;background:#7BA3D0"></div></div>
+      </div>
+      <div class="noise-card">
+        <div class="noise-card-header">
+          <span class="noise-card-dot" style="background:#7D7D7D"></span>FAST <span class="noise-card-tag">frequency BPE</span>
+        </div>
+        <div class="noise-card-value" id="nc-fast">1.0<span class="noise-card-x">&times;</span></div>
+        <div class="noise-card-bar-track"><div class="noise-card-bar" id="ncbar-fast" style="width:0%;background:#7D7D7D"></div></div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue"><strong>Visual grounding filters noise.</strong> At &sigma;=0.2, FAST degrades by <strong>10.7&times;</strong>, the action-only tokenizer by <strong>2.7&times;</strong>, and UniT by only <strong>1.7&times;</strong>. The gap confirms that visual grounding regularizes the latent space, filtering out kinematic noise that lacks visual correspondence.</div>
+  </div>
+</section>
+
+<!-- Conclusion -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">Looking Forward</div>
+    <h2 class="section-title">Toward Scalable Embodied Intelligence</h2>
+    <p class="narrative-text">UniT demonstrates that a visual-anchored unified physical language can replace manual motion retargeting, serving both policy execution and world imagination within a single token interface.</p>
+    <p class="narrative-text">The visual branch encodes physical transitions from observations alone — without paired action annotations — opening a path toward absorbing the vast reservoir of <strong>internet-scale video</strong> where humans perform diverse tasks without motor labels. Furthermore, UniT's dual interface enables a closed-loop possibility: policies propose latent actions, world models simulate their visual consequences, and the resulting imagined rollouts can flow back as reward signals for reinforcement learning or enable test-time planning through search over the latent space.</p>
+  </div>
+</section>
+
+<!-- Citation -->
+<section class="section" id="citation">
+  <div class="container">
+    <div class="section-label">Citation</div>
+    <h2 class="section-title">BibTeX</h2>
+    <div class="citation-block"><button class="copy-btn" onclick="copyBib()">Copy</button>@article{unit2026,
+  title={UniT: Toward a Unified Physical Language for Human-to-Humanoid Policy Learning and World Modeling},
+  author={},
+  journal={NeurIPS},
+  year={2026}
+}</div>
+  </div>
+</section>
+
+<footer>UniT Project Page &middot; 2026</footer>
+
+<!-- ═══════════ Scripts ═══════════ -->
+<script>
+/* ── Generic tab system ── */
+function positionTabSlider(bar) {
+  const activeBtn = bar.querySelector('.tab-btn.active');
+  const slider = bar.querySelector('.tab-slider');
+  if (!activeBtn || !slider) return;
+  const barRect = bar.getBoundingClientRect();
+  const btnRect = activeBtn.getBoundingClientRect();
+  slider.style.left = (btnRect.left - barRect.left) + 'px';
+  slider.style.width = btnRect.width + 'px';
+}
+function initTabs() {
+  document.querySelectorAll('.tab-bar').forEach(bar => {
+    /* inject slider element */
+    const slider = document.createElement('div');
+    slider.className = 'tab-slider';
+    bar.appendChild(slider);
+    slider.style.transition = 'none';
+    requestAnimationFrame(() => { positionTabSlider(bar); requestAnimationFrame(() => { slider.style.transition = ''; }); });
+
+    const group = bar.dataset.tabgroup;
+    bar.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        positionTabSlider(bar);
+        document.querySelectorAll(`.tab-panel[data-tabgroup="${group}"]`).forEach(p => p.classList.remove('active'));
+        const target = document.querySelector(`.tab-panel[data-tabgroup="${group}"][data-tab="${btn.dataset.tab}"]`);
+        if (target) {
+          target.classList.add('active');
+          /* play videos that became visible */
+          target.querySelectorAll('video').forEach(v => { try { v.play(); } catch(e){} });
+          setTimeout(() => {
+            /* reposition any child tab-bar sliders that were hidden at init */
+            target.querySelectorAll('.tab-bar').forEach(childBar => positionTabSlider(childBar));
+            target.querySelectorAll('canvas').forEach(c => {
+              if (c._lazyChart && !c._chartInit) { c._lazyChart(); c._chartInit = true; }
+            });
+            target.querySelectorAll('.tab-panel.active canvas').forEach(c => {
+              if (c._lazyChart && !c._chartInit) { c._lazyChart(); c._chartInit = true; }
+            });
+          }, 30);
+        }
+        /* pause videos in hidden panels */
+        document.querySelectorAll(`.tab-panel[data-tabgroup="${group}"]:not(.active) video`).forEach(v => v.pause());
+      });
+    });
+  });
+}
+initTabs();
+window.addEventListener('resize', () => { document.querySelectorAll('.tab-bar').forEach(bar => positionTabSlider(bar)); });
+
+/* ── Chart.js global config ── */
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+Chart.defaults.plugins.legend.labels.padding = 16;
+Chart.defaults.plugins.legend.labels.boxWidth = 8;
+
+const C = {
+  blue: '#5B8DC9', blueLight: '#C5DCF2', blueMid: '#7BA3D0', blueAlpha: 'rgba(91,141,201,0.18)',
+  yellow: '#F5D76E', yellowAlpha: 'rgba(245,215,110,0.25)',
+  gray: '#AAAAAA', grayAlpha: 'rgba(170,170,170,0.18)',
+  blueDk: '#B8D4F0',
+  red: '#D96459', redAlpha: 'rgba(217,100,89,0.15)',
+  purple: '#9B8EC4', purpleAlpha: 'rgba(155,142,196,0.15)',
+  orange: '#E8A04C', orangeAlpha: 'rgba(232,160,76,0.15)',
+};
+
+function se(p, n) { return (p <= 0 || p >= 1) ? 0.01 : Math.sqrt(p * (1 - p) / n); }
+const pct = v => v + '%';
+
+const errorBarPlugin = {
+  id: 'errorBars',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    chart.data.datasets.forEach((ds, di) => {
+      if (!ds.errorBars) return;
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach((bar, i) => {
+        const err = ds.errorBars[i];
+        if (!err || err === 0) return;
+        const x = bar.x, yScale = chart.scales.y, val = ds.data[i];
+        ctx.save();
+        ctx.strokeStyle = '#555555';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(x, yScale.getPixelForValue(val + err));
+        ctx.lineTo(x, yScale.getPixelForValue(val - err));
+        ctx.stroke();
+        ctx.restore();
+      });
+    });
+  }
+};
+
+const shadowBarPlugin = {
+  id: 'shadowBars',
+  beforeDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    chart.data.datasets.forEach((ds, di) => {
+      if (ds.hideShadow) return;
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach((bar, i) => {
+        const val = ds.data[i];
+        if (!val || val <= 0) return;
+        const yScale = chart.scales.y;
+        const baseVal = ds.base != null ? ds.base : 0;
+        const yBase = yScale.getPixelForValue(baseVal), yTop = yScale.getPixelForValue(val);
+        const w = bar.width || 20, offX = 3, offY = 2, r = 4;
+        const x = bar.x - w/2 + offX, y = yTop + offY, bw = w, bh = yBase - yTop;
+        ctx.save();
+        ctx.fillStyle = 'rgba(170,170,170,0.35)';
+        ctx.beginPath();
+        ctx.moveTo(x + r, y); ctx.lineTo(x + bw - r, y);
+        ctx.quadraticCurveTo(x + bw, y, x + bw, y + r);
+        ctx.lineTo(x + bw, y + bh); ctx.lineTo(x, y + bh);
+        ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.fill(); ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(errorBarPlugin, shadowBarPlugin);
+
+const scaleOpts = (max, min) => ({
+  y: {
+    beginAtZero: !min, min: min || 0, max,
+    ticks: { callback: pct, font: { size: 11 }, color: '#888' },
+    grid: { color: 'rgba(0,0,0,0.06)', lineWidth: 0.8 },
+    title: { display: true, text: 'Performance', font: { size: 12, weight: '500' }, color: '#888' }
+  },
+  x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#555' } }
+});
+const chartTitle = (text) => ({
+  display: true, text, align: 'center',
+  font: { size: 14, weight: '600', family: "'Inter', sans-serif" },
+  color: '#1a1a1a', padding: { bottom: 16 }
+});
+
+/* ═══════════ Benchmark ═══════════ */
+(() => {
+  const methods = ['UWM','Diff.\nPolicy','FAST','\u03C0\u2080','GR00T\nN1.6','GR00T\nQwen3','OFT','FLARE','VLA-UniT\n(Ours)'];
+  const vals = [29.5, 40.9, 39.0, 43.9, 47.6, 47.8, 48.8, 55.0, 66.7];
+  const n = 24*50;
+  const bgColors = ['#A8D5E2','#89C4CF','#7CB9BA','#9BB5D6','#8FAACF','#7BA3D0','#B0A4CC','#A698C4','#F5D76E'];
+
+  const flareHighlight = {
+    id: 'flareHighlight',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx, meta = chart.getDatasetMeta(0), xs = chart.scales.x, ys = chart.scales.y;
+      const unitBar = meta.data[8], flareBar = meta.data[7], grootBar = meta.data[5];
+      if (!unitBar || !flareBar || !grootBar) return;
+      const unitY = ys.getPixelForValue(66.7);
+      const flareY = ys.getPixelForValue(55.0);
+      const grootY = ys.getPixelForValue(47.8);
+      ctx.save();
+      // Dashed horizontal reference line at UniT level (66.7%)
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = 'rgba(196,144,0,0.35)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(xs.left, unitY); ctx.lineTo(xs.right, unitY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '500 9px Inter, sans-serif';
+      ctx.fillStyle = '#c49000';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+      ctx.fillText('VLA-UniT (66.7%)', xs.right - 2, unitY - 3);
+      // Vertical arrow above FLARE bar: FLARE -> UniT level (+11.7%)
+      const fx = flareBar.x, halfW = (flareBar.width || 20) / 2;
+      ctx.strokeStyle = '#c49000'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath(); ctx.moveTo(fx, flareY - 2); ctx.lineTo(fx, unitY + 4); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c49000';
+      ctx.beginPath(); ctx.moveTo(fx, unitY + 2); ctx.lineTo(fx - 4, unitY + 8); ctx.lineTo(fx + 4, unitY + 8); ctx.closePath(); ctx.fill();
+      ctx.font = '700 10px Inter, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText('+11.7%', fx, unitY - 2);
+      // Vertical arrow above GR00T bar: GR00T -> UniT level (+18.9%)
+      const gx = grootBar.x;
+      ctx.strokeStyle = '#5B8DC9';
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath(); ctx.moveTo(gx, grootY - 2); ctx.lineTo(gx, unitY + 4); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#5B8DC9';
+      ctx.beginPath(); ctx.moveTo(gx, unitY + 2); ctx.lineTo(gx - 4, unitY + 8); ctx.lineTo(gx + 4, unitY + 8); ctx.closePath(); ctx.fill();
+      ctx.font = '700 10px Inter, sans-serif';
+      ctx.fillText('+18.9%', gx, unitY - 2);
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('chart-benchmark'), {
+    type: 'bar',
+    plugins: [flareHighlight],
+    data: { labels: methods, datasets: [{ data: vals, backgroundColor: bgColors, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: vals.map(v => se(v/100,n)*100) }] },
+    options: { responsive: true, plugins: { legend: { display: false }, title: chartTitle('Benchmark Performance — RoboCasa GR1') }, scales: scaleOpts(80) }
+  });
+})();
+
+/* ═══════════ Data Efficiency ═══════════ */
+(() => {
+  const n = 24*50;
+  const labels = ['GR00T\n10%', 'GR00T\n100%', 'VLA-UniT\n10%', 'VLA-UniT\n100%'];
+  const vals   = [21.3, 47.8, 45.5, 66.7];
+  const colors = [C.blue, C.blue, C.yellow, C.yellow];
+  /* lighter shade for 10% bars to visually distinguish data regime */
+  const bgColors = ['rgba(91,141,201,0.45)', C.blue, 'rgba(245,215,110,0.55)', C.yellow];
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  }
+
+  const effAnnot = {
+    id: 'effAnnot',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx, ys = chart.scales.y, xs = chart.scales.x;
+      const meta = chart.getDatasetMeta(0);
+      const unitFew = meta.data[2], grootFull = meta.data[1];
+      if (!unitFew || !grootFull) return;
+      ctx.save();
+
+      const y1 = ys.getPixelForValue(45.5), y2 = ys.getPixelForValue(47.8);
+
+      /* ── Shaded band between the two comparable levels ── */
+      ctx.fillStyle = 'rgba(196,144,0,0.06)';
+      ctx.fillRect(xs.left, Math.min(y1,y2), xs.right - xs.left, Math.abs(y2 - y1) || 2);
+
+      /* ── Dashed reference lines ── */
+      ctx.setLineDash([4,3]);
+      ctx.strokeStyle = 'rgba(196,144,0,0.30)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(xs.left, y1); ctx.lineTo(xs.right, y1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xs.left, y2); ctx.lineTo(xs.right, y2); ctx.stroke();
+      ctx.setLineDash([]);
+
+      /* ── Curved connector: VLA-UniT@10% → GR00T@100% ── */
+      const x1 = unitFew.x, x2 = grootFull.x;
+      const cpx = (x1 + x2) / 2, cpy = Math.min(y1, y2) - 28;
+      ctx.strokeStyle = '#c49000'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(x1, y1 - 2); ctx.quadraticCurveTo(cpx, cpy, x2, y2 - 2); ctx.stroke();
+      ctx.setLineDash([]);
+      /* arrowhead */
+      ctx.fillStyle = '#c49000';
+      ctx.beginPath(); ctx.moveTo(x2, y2 - 2); ctx.lineTo(x2 - 4, y2 - 9); ctx.lineTo(x2 + 4, y2 - 9); ctx.closePath(); ctx.fill();
+
+      /* ── Pill label ── */
+      const label = '10\u00d7 less data';
+      ctx.font = '700 11px Inter, sans-serif';
+      const tw = ctx.measureText(label).width;
+      const pw = tw + 16, ph = 22, px = cpx - pw/2, py = cpy - ph - 4;
+      ctx.fillStyle = 'rgba(196,144,0,0.12)';
+      roundRect(ctx, px, py, pw, ph, 11); ctx.fill();
+      ctx.strokeStyle = 'rgba(196,144,0,0.35)'; ctx.lineWidth = 1;
+      roundRect(ctx, px, py, pw, ph, 11); ctx.stroke();
+      ctx.fillStyle = '#c49000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(label, cpx, py + ph/2);
+
+      ctx.restore();
+    }
+  };
+
+  const effCanvas = document.getElementById('chart-efficiency');
+  effCanvas._lazyChart = () => {
+    new Chart(effCanvas, {
+      type: 'bar',
+      plugins: [effAnnot],
+      data: { labels, datasets: [{
+        data: vals, backgroundColor: bgColors,
+        borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5,
+        errorBars: vals.map(v => se(v/100,n)*100)
+      }]},
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, title: chartTitle('Data Efficiency — RoboCasa GR1') },
+        scales: scaleOpts(80)
+      }
+    });
+  };
+})();
+
+/* ═══════════ Human Data Ablation ═══════════ */
+(() => {
+  const labels = ['Pick&Place','Articulated','In-Domain\nAvg','Unseen\nAppear.','Unseen\nCombs','Unseen\nObj Types','OOD Avg'];
+  const robot = [41.70,56.66,45.5,37.0,40.73,29.0,34.7];
+  const human = [49.40,51.70,49.98,42.7,43.01,33.0,38.5];
+  const ns = [18*50,6*50,24*50,18*50,23*50,32*50,73*50];
+
+  const zonePlugin = {
+    id: 'humanDataZones',
+    beforeDraw(chart) {
+      const ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      const ticks = xs.ticks;
+      if (!ticks || ticks.length < 7) return;
+      const inEnd = (xs.getPixelForValue(2) + xs.getPixelForValue(3)) / 2;
+      const left = xs.left, right = xs.right, top = ys.top, bottom = ys.bottom;
+      ctx.save();
+      ctx.fillStyle = 'rgba(91,141,201,0.06)';
+      ctx.fillRect(left, top, inEnd - left, bottom - top);
+      ctx.fillStyle = 'rgba(245,215,110,0.06)';
+      ctx.fillRect(inEnd, top, right - inEnd, bottom - top);
+      ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+      ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(inEnd, top); ctx.lineTo(inEnd, bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '600 11px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(91,141,201,0.6)';
+      ctx.textAlign = 'center';
+      ctx.fillText('In-Domain', (left + inEnd) / 2, top + 14);
+      ctx.fillStyle = 'rgba(200,160,40,0.6)';
+      ctx.fillText('OOD Generalization', (inEnd + right) / 2, top + 14);
+
+      ctx.restore();
+    },
+    afterDraw(chart) {
+      /* Manually render OOD tick labels: "Unseen" normal, category word bold+gold */
+      const ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      const pad = xs.options.ticks.padding || 3;
+      const lh = 13.2; /* 11px * 1.2 */
+      const oodLabels = [
+        { idx: 3, word: 'Appear.' },
+        { idx: 4, word: 'Combs' },
+        { idx: 5, word: 'Obj Types' }
+      ];
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      oodLabels.forEach(({ idx, word }) => {
+        const cx = xs.getPixelForValue(idx);
+        const y0 = ys.bottom + pad;
+        /* line 1: "Unseen" — normal gray */
+        ctx.font = '400 11px Inter, sans-serif';
+        ctx.fillStyle = '#555';
+        ctx.fillText('Unseen', cx, y0);
+        /* line 2: category word — bold gold */
+        ctx.font = '700 11px Inter, sans-serif';
+        ctx.fillStyle = '#b8860b';
+        ctx.fillText(word, cx, y0 + lh);
+      });
+      ctx.restore();
+    }
+  };
+
+  /* Arrows on In-Domain Avg (idx 2) and OOD Avg (idx 6) — relative improvement */
+  const humanGainPlugin = {
+    id: 'humanGain',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx, ys = chart.scales.y, xs = chart.scales.x;
+      const metaRobot = chart.getDatasetMeta(0), metaHuman = chart.getDatasetMeta(1);
+      const pairs = [
+        { idx: 2, color: '#5B8DC9' },   /* In-Domain Avg */
+        { idx: 6, color: '#c49000' }     /* OOD Avg */
+      ];
+      ctx.save();
+      pairs.forEach(({ idx, color }) => {
+        const robotBar = metaRobot.data[idx], humanBar = metaHuman.data[idx];
+        if (!robotBar || !humanBar) return;
+        const bx = robotBar.x;       /* line anchored to robot bar center */
+        const robotY = ys.getPixelForValue(robot[idx]);
+        const humanY = ys.getPixelForValue(human[idx]);
+        const rel = ((human[idx] - robot[idx]) / robot[idx] * 100).toFixed(1);
+
+        /* horizontal dashed reference line at +Human level — local span only */
+        const hw = (robotBar.width || 20) * 1.2;
+        const lineL = Math.min(robotBar.x, humanBar.x) - hw;
+        const lineR = Math.max(robotBar.x, humanBar.x) + hw;
+        ctx.strokeStyle = color; ctx.lineWidth = 0.8;
+        ctx.setLineDash([4, 3]);
+        ctx.globalAlpha = 0.45;
+        ctx.beginPath(); ctx.moveTo(lineL, humanY); ctx.lineTo(lineR, humanY); ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        /* vertical dashed arrow from robot bar top → human level */
+        ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+        ctx.setLineDash([5, 3]);
+        ctx.beginPath(); ctx.moveTo(bx, robotY - 2); ctx.lineTo(bx, humanY + 4); ctx.stroke();
+        ctx.setLineDash([]);
+
+        /* arrowhead at top */
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.moveTo(bx, humanY + 2); ctx.lineTo(bx - 4, humanY + 8); ctx.lineTo(bx + 4, humanY + 8); ctx.closePath(); ctx.fill();
+
+        /* relative gain label */
+        ctx.font = '700 10px Inter, sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText('\u2191' + rel + '% rel.', bx, humanY - 2);
+      });
+
+      /* explanatory note below chart area */
+      ctx.font = '400 9px Inter, sans-serif';
+      ctx.fillStyle = '#999'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+      ctx.fillText('rel. = relative improvement over Robot Only', xs.right, ys.bottom + 28);
+
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('chart-human-data'), {
+    type: 'bar',
+    plugins: [zonePlugin, humanGainPlugin],
+    data: { labels, datasets: [
+      { label: 'VLA-UniT (Robot Only)', data: robot, backgroundColor: C.blue, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: robot.map((v,i) => se(v/100,ns[i])*100) },
+      { label: 'VLA-UniT + Human', data: human, backgroundColor: C.yellow, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: human.map((v,i) => se(v/100,ns[i])*100) }
+    ]},
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'top' }, title: chartTitle('Human Data Unlocks Generalization') },
+      scales: {
+        ...scaleOpts(65),
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { size: 11 },
+            color: function(ctx) {
+              return (ctx.index >= 3 && ctx.index <= 5) ? 'transparent' : '#555';
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
+/* ═══════════ Zero-Shot ═══════════ */
+(() => {
+  const methods = ['GR00T\nBaseline','w/o\nCross-Recon','VLA-UniT\nw/o Human','VLA-UniT\nw/ Human'];
+  const vals = [0,0,10,60]; const n = 10;
+  const colors = ['#A8D5E2','#7CB9BA',C.blue,C.yellow];
+  new Chart(document.getElementById('chart-zero-shot'), {
+    type: 'bar',
+    data: { labels: methods, datasets: [{ data: vals, backgroundColor: colors, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: vals.map(v => se(v/100,n)*100) }] },
+    options: { responsive: true, plugins: { legend: { display: false }, title: chartTitle('Zero-Shot Task Transfer — Bowl Stacking') }, scales: scaleOpts(80) }
+  });
+})();
+
+/* ═══════════ Real Robot In-Domain ═══════════ */
+(() => {
+  const groot = [30,5], robot = [70,35], human = [77.5,75]; const ns = [40,20];
+  new Chart(document.getElementById('chart-real-indomain'), {
+    type: 'bar',
+    data: { labels: ['Pick & Place','Bimanual Pouring'], datasets: [
+      { label: 'GR00T', data: groot, backgroundColor: '#A8D5E2', borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: groot.map((v,i) => se(v/100,ns[i])*100) },
+      { label: 'VLA-UniT w/o Human', data: robot, backgroundColor: C.blue, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: robot.map((v,i) => se(v/100,ns[i])*100) },
+      { label: 'VLA-UniT w/ Human', data: human, backgroundColor: C.yellow, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: human.map((v,i) => se(v/100,ns[i])*100) }
+    ]},
+    options: { responsive: true, plugins: { legend: { position: 'top' }, title: chartTitle('Real Robot — In-Domain') }, scales: scaleOpts(100) }
+  });
+})();
+
+/* ═══════════ Real Robot OOD ═══════════ */
+(() => {
+  const labels = ['Background\nTransfer','Target\nTransfer','Distractor\nTransfer','Geometry\nTransfer','Combinational\nTransfer'];
+  const ns = [30,20,30,30,10];
+  const groot = [20,20,10,0,30], robot = [33.33,45,26.67,23.33,20], human = [73.33,65,60,63.33,70];
+  new Chart(document.getElementById('chart-real-ood'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'GR00T', data: groot, backgroundColor: '#A8D5E2', borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: groot.map((v,i) => se(v/100,ns[i])*100) },
+      { label: 'VLA-UniT w/o Human', data: robot, backgroundColor: C.blue, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: robot.map((v,i) => se(v/100,ns[i])*100) },
+      { label: 'VLA-UniT w/ Human', data: human, backgroundColor: C.yellow, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: human.map((v,i) => se(v/100,ns[i])*100) }
+    ]},
+    options: { responsive: true, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } }, title: chartTitle('Real Robot — OOD Generalization') }, scales: scaleOpts(100) }
+  });
+})();
+
+/* ═══════════ Ablation OOD ═══════════ */
+(() => {
+  const labels = ['Unseen\nAppearance','Unseen\nCombs','Unseen\nObj Types','OOD Avg'];
+  const nsArr = [18*50,23*50,32*50,73*50];
+  const noXR = [34.3,33.07,26.0,30.3], action = [49.4,49.48,32.6,42.1], vision = [53.0,50.26,37.25,45.2], full = [57.2,57.4,40.4,49.9];
+  const oodMin = 20;
+  new Chart(document.getElementById('chart-ablation-ood'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'w/o Cross-Recon', data: noXR, base: oodMin, backgroundColor: '#B8D4F0', borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: noXR.map((v,i) => se(v/100,nsArr[i])*100) },
+      { label: 'VLA-Action', data: action, base: oodMin, backgroundColor: '#7BA3D0', borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: action.map((v,i) => se(v/100,nsArr[i])*100) },
+      { label: 'VLA-Vision', data: vision, base: oodMin, backgroundColor: C.blue, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: vision.map((v,i) => se(v/100,nsArr[i])*100) },
+      { label: 'VLA-UniT', data: full, base: oodMin, backgroundColor: C.yellow, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: full.map((v,i) => se(v/100,nsArr[i])*100) }
+    ]},
+    options: { responsive: true, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } }, title: chartTitle('Ablation — OOD Performance') }, scales: scaleOpts(65, oodMin) }
+  });
+})();
+
+/* ═══════════ Ablation In-Domain ═══════════ */
+(() => {
+  const methods = ['w/o\nCross-Recon','VLA-\nAction','VLA-\nVilla','VLA-\nVision','VLA-UniT'];
+  const pp = [41.1,57.0,63.1,63.6,66.8];
+  const uc = [38.4,59.1,63.3,63.1,65.1];
+  const n_pp = 18*50, n_uc = 23*50;
+  const ablColors = ['#B8D4F0','#7BA3D0','#A8C8E8','#5B8DC9','#F5D76E'];
+  const idMin = 35;
+  new Chart(document.getElementById('chart-ablation-indomain'), {
+    type: 'bar',
+    data: { labels: methods, datasets: [
+      { label: 'Pick & Place (In-Domain)', data: pp, base: idMin, backgroundColor: ablColors, borderColor: 'rgba(0,0,0,0.08)', borderWidth: 0.5, borderRadius: 5, errorBars: pp.map(v => se(v/100,n_pp)*100) },
+    ]},
+    options: { responsive: true, plugins: { legend: { display: false }, title: chartTitle('Ablation — Pick & Place (In-Domain)') }, scales: scaleOpts(70, idMin) }
+  });
+})();
+
+/* ═══════════ Noise Robustness — interactive ═══════════ */
+(() => {
+  const sigmas = [0, 0.05, 0.1, 0.2, 0.3, 0.5];
+  const unit_mse =   [0.000250, 0.000259, 0.000294, 0.000431, 0.000644, 0.001443];
+  const action_mse = [0.000224, 0.000253, 0.000330, 0.000607, 0.000997, 0.002086];
+  const fast_mse =   [0.000171, 0.000185, 0.000325, 0.001828, 0.004009, 0.009686];
+  const unit_deg = unit_mse.map(v => v / unit_mse[0]);
+  const action_deg = action_mse.map(v => v / action_mse[0]);
+  const fast_deg = fast_mse.map(v => v / fast_mse[0]);
+
+  /* interpolate degradation at arbitrary sigma */
+  function lerp(arr, sigma) {
+    if (sigma <= sigmas[0]) return arr[0];
+    if (sigma >= sigmas[sigmas.length-1]) return arr[arr.length-1];
+    for (let i = 0; i < sigmas.length - 1; i++) {
+      if (sigma >= sigmas[i] && sigma <= sigmas[i+1]) {
+        const t = (sigma - sigmas[i]) / (sigmas[i+1] - sigmas[i]);
+        return arr[i] + t * (arr[i+1] - arr[i]);
+      }
+    }
+    return arr[arr.length-1];
+  }
+
+  const slider = document.getElementById('sigma-slider');
+  const display = document.getElementById('sigma-display');
+  const ncUnit = document.getElementById('nc-unit');
+  const ncAction = document.getElementById('nc-action');
+  const ncFast = document.getElementById('nc-fast');
+  const barUnit = document.getElementById('ncbar-unit');
+  const barAction = document.getElementById('ncbar-action');
+  const barFast = document.getElementById('ncbar-fast');
+  const dragHint = document.getElementById('noise-drag-hint');
+  let _noiseChart = null;
+
+  function updateNoise(sigma) {
+    if (dragHint && sigma > 0) dragHint.classList.add('hidden');
+    const u = lerp(unit_deg, sigma), a = lerp(action_deg, sigma), f = lerp(fast_deg, sigma);
+    display.textContent = sigma.toFixed(2);
+    ncUnit.innerHTML = u.toFixed(1) + '<span class="noise-card-x">&times;</span>';
+    ncAction.innerHTML = a.toFixed(1) + '<span class="noise-card-x">&times;</span>';
+    ncFast.innerHTML = f.toFixed(1) + '<span class="noise-card-x">&times;</span>';
+    const maxDeg = Math.max(f, 60);
+    barUnit.style.width = ((u - 1) / (maxDeg - 1) * 100) + '%';
+    barAction.style.width = ((a - 1) / (maxDeg - 1) * 100) + '%';
+    barFast.style.width = ((f - 1) / (maxDeg - 1) * 100) + '%';
+    if (_noiseChart) { _noiseChart._cursorSigma = sigma; _noiseChart.update('none'); }
+  }
+
+  slider.addEventListener('input', () => updateNoise(parseFloat(slider.value) / 100));
+
+  /* chart line options with filled area */
+  const lineOpts = (label, data, color, fillColor) => ({
+    label, data, borderColor: color, backgroundColor: fillColor,
+    borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#fff',
+    pointBorderColor: color, pointBorderWidth: 2, pointHoverRadius: 6,
+    tension: 0.3, fill: 'origin',
+  });
+
+  /* cursor line plugin */
+  const cursorPlugin = {
+    id: 'noiseCursor',
+    afterDatasetsDraw(chart) {
+      const sigma = chart._cursorSigma;
+      if (sigma == null || sigma <= 0) return;
+      const ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      /* map sigma to pixel using linear interpolation across label positions */
+      let xPx;
+      if (sigma >= sigmas[sigmas.length-1]) { xPx = xs.getPixelForValue(sigmas.length-1); }
+      else {
+        for (let i = 0; i < sigmas.length - 1; i++) {
+          if (sigma >= sigmas[i] && sigma <= sigmas[i+1]) {
+            const t = (sigma - sigmas[i]) / (sigmas[i+1] - sigmas[i]);
+            xPx = xs.getPixelForValue(i) + t * (xs.getPixelForValue(i+1) - xs.getPixelForValue(i));
+            break;
+          }
+        }
+      }
+      if (xPx == null) return;
+      ctx.save();
+      /* vertical highlight line */
+      ctx.strokeStyle = 'rgba(26,26,26,0.35)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(xPx, ys.top); ctx.lineTo(xPx, ys.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+
+      /* dot + value on each curve — with collision avoidance */
+      const u = lerp(unit_deg, sigma), a = lerp(action_deg, sigma), f = lerp(fast_deg, sigma);
+      const items = [
+        { v: u, c: '#F5D76E', dc: '#c49000' },
+        { v: a, c: '#7BA3D0', dc: '#5A88B8' },
+        { v: f, c: '#7D7D7D', dc: '#555' }
+      ];
+      /* compute raw y positions and resolve overlaps */
+      const minGap = 14;
+      const positions = items.map(it => ({ ...it, yPx: ys.getPixelForValue(it.v) }));
+      positions.sort((a, b) => a.yPx - b.yPx); /* sort top to bottom */
+      for (let i = 1; i < positions.length; i++) {
+        const gap = positions[i].yPx - positions[i-1].yPx;
+        if (gap < minGap) {
+          const push = (minGap - gap) / 2;
+          positions[i-1].yPx -= push;
+          positions[i].yPx += push;
+        }
+      }
+      /* second pass for triple overlap */
+      for (let i = 1; i < positions.length; i++) {
+        if (positions[i].yPx - positions[i-1].yPx < minGap) {
+          positions[i].yPx = positions[i-1].yPx + minGap;
+        }
+      }
+      items.forEach((it, idx) => {
+        const dotY = ys.getPixelForValue(it.v);
+        const labelY = positions.find(p => p.v === it.v).yPx;
+        /* dot on curve */
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(xPx, dotY, 5, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = it.c; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(xPx, dotY, 5, 0, Math.PI*2); ctx.stroke();
+        /* label with background pill */
+        const txt = it.v.toFixed(1) + '\u00d7';
+        ctx.font = '700 10px Inter, sans-serif';
+        const tw = ctx.measureText(txt).width;
+        const lx = xPx + 12, ly = labelY;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.beginPath();
+        const pw = tw + 8, ph = 14, pr = 3;
+        ctx.moveTo(lx-2+pr, ly-ph/2); ctx.lineTo(lx-2+pw-pr, ly-ph/2);
+        ctx.quadraticCurveTo(lx-2+pw, ly-ph/2, lx-2+pw, ly-ph/2+pr);
+        ctx.lineTo(lx-2+pw, ly+ph/2-pr); ctx.quadraticCurveTo(lx-2+pw, ly+ph/2, lx-2+pw-pr, ly+ph/2);
+        ctx.lineTo(lx-2+pr, ly+ph/2); ctx.quadraticCurveTo(lx-2, ly+ph/2, lx-2, ly+ph/2-pr);
+        ctx.lineTo(lx-2, ly-ph/2+pr); ctx.quadraticCurveTo(lx-2, ly-ph/2, lx-2+pr, ly-ph/2);
+        ctx.fill();
+        ctx.fillStyle = it.dc; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(txt, lx, ly);
+      });
+      /* sigma label at bottom */
+      ctx.font = '600 10px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(26,26,26,0.6)'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('\u03c3=' + sigma.toFixed(2), xPx, ys.bottom + 4);
+      ctx.restore();
+    }
+  };
+
+  const degradEl = document.getElementById('chart-noise-degradation');
+  if (degradEl) {
+    _noiseChart = new Chart(degradEl, {
+      type: 'line', plugins: [cursorPlugin],
+      data: { labels: sigmas.map(String), datasets: [
+        lineOpts('UniT (vision+action)', unit_deg, '#F5D76E', 'rgba(245,215,110,0.10)'),
+        lineOpts('Action-Only Tokenizer', action_deg, '#7BA3D0', 'rgba(123,163,208,0.08)'),
+        lineOpts('FAST Tokenizer', fast_deg, '#7D7D7D', 'rgba(125,125,125,0.06)'),
+      ]},
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { title: chartTitle('Relative Degradation vs. Noise Level'), legend: { position: 'top' } },
+        scales: {
+          y: { type: 'logarithmic', title: { display: true, text: 'MSE\u2099\u2092\u1d62\u209b\u2091 / MSE\u2080', font: { size: 12, weight: '500' }, color: '#888' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+          x: { title: { display: true, text: 'Noise Level (\u03c3)', font: { size: 12, weight: '500' }, color: '#888' }, grid: { color: 'rgba(0,0,0,0.04)' } }
+        }
+      }
+    });
+    _noiseChart._cursorSigma = 0;
+  }
+})();
+
+/* ═══════════ t-SNE ═══════════ */
+const TSNE_BLUE = '#5B8DC9';
+const TSNE_YELLOW = '#F5D76E';
+let _tsneGlobalData = null;
+
+const MORPH_CONFIGS = [
+  { canvasId: 'tsne-morph-token', baselineKey: 'raw_action', unitKey: 'latent_action',
+    labels: ['Raw Action Space \u2014 separated clusters', 'UniT Token Embeddings \u2014 overlapping distributions'] },
+  { canvasId: 'tsne-morph-vla', baselineKey: 'vl_baseline', unitKey: 'vl_unit',
+    labels: ['GR00T-Qwen2.5 \u2014 separated VLM features', 'VLA-UniT \u2014 aligned VLM features'] },
+  { canvasId: 'tsne-morph-wm', baselineKey: 'wm_baseline', unitKey: 'wm_unit',
+    labels: ['Cosmos Predict 2.5 Action-Conditioned \u2014 disjoint cross-attention features', 'WM-UniT \u2014 unified cross-attention features'] },
+];
+
+function buildMorphPoints(data, baselineKey, unitKey) {
+  const bHum = data[baselineKey].humanoid, bHmn = data[baselineKey].human;
+  const uHum = data[unitKey].humanoid, uHmn = data[unitKey].human;
+  const pts = [];
+  const n = Math.min(bHum.length, uHum.length);
+  for (let i = 0; i < n; i++) {
+    pts.push({ bx: bHum[i][0], by: bHum[i][1], ux: uHum[i][0], uy: uHum[i][1], c: TSNE_BLUE });
+  }
+  const m = Math.min(bHmn.length, uHmn.length);
+  for (let i = 0; i < m; i++) {
+    pts.push({ bx: bHmn[i][0], by: bHmn[i][1], ux: uHmn[i][0], uy: uHmn[i][1], c: TSNE_YELLOW });
+  }
+  for (let i = pts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pts[i], pts[j]] = [pts[j], pts[i]];
+  }
+  return pts;
+}
+
+function computeScaling(pts, W, H) {
+  const padL = 34, padB = 24, padT = 16, padR = 16;
+  const allCoords = [];
+  for (const p of pts) { allCoords.push(p.bx, p.ux); }
+  const allY = [];
+  for (const p of pts) { allY.push(p.by, p.uy); }
+  const xMin = Math.min(...allCoords), xMax = Math.max(...allCoords);
+  const yMin = Math.min(...allY), yMax = Math.max(...allY);
+  const dataRange = Math.max(xMax - xMin, yMax - yMin) * 1.15 || 1;
+  const xMid = (xMin + xMax) / 2, yMid = (yMin + yMax) / 2;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const scaleX = plotW / dataRange, scaleY = plotH / dataRange;
+  const sx = v => padL + (v - (xMid - dataRange / 2)) * scaleX;
+  const sy = v => padT + ((yMid + dataRange / 2) - v) * scaleY;
+  return { padL, padB, padT, padR, plotW, plotH, sx, sy, dataRange, xMid, yMid };
+}
+
+function drawMorphFrame(canvas, pts, t, scale) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  if (W < 10 || H < 10) return;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+  const { padL, padT, plotW, plotH, sx, sy, dataRange, xMid } = scale;
+
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(0,0,0,0.20)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH); ctx.stroke();
+
+  ctx.font = '400 8px Inter, sans-serif'; ctx.fillStyle = '#aaa';
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 0.5;
+  const nTicks = 4, dMin = xMid - dataRange / 2;
+  for (let i = 0; i <= nTicks; i++) {
+    const frac = i / nTicks, val = Math.round(dMin + frac * dataRange);
+    const xPx = padL + frac * plotW, yPx = padT + (1 - frac) * plotH;
+    ctx.beginPath(); ctx.moveTo(xPx, padT + plotH); ctx.lineTo(xPx, padT + plotH + 4); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(val, xPx, padT + plotH + 5);
+    ctx.beginPath(); ctx.moveTo(padL - 4, yPx); ctx.lineTo(padL, yPx); ctx.stroke();
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(Math.round(dMin + frac * dataRange), padL - 6, yPx);
+  }
+
+  const r = Math.max(3, Math.min(4.5, plotH / 80));
+  ctx.save();
+  ctx.beginPath(); ctx.rect(padL, padT, plotW, plotH); ctx.clip();
+  for (const pt of pts) {
+    const cx = pt.bx + (pt.ux - pt.bx) * t;
+    const cy = pt.by + (pt.uy - pt.by) * t;
+    ctx.beginPath();
+    ctx.arc(sx(cx), sy(cy), r, 0, Math.PI * 2);
+    ctx.fillStyle = pt.c;
+    ctx.globalAlpha = 0.65;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+
+  ctx.font = '600 11px Inter, sans-serif'; ctx.globalAlpha = 0.9;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const legY1 = padT + 10, legY2 = padT + 26;
+  const hmW = ctx.measureText('Humanoid').width;
+  const dotX = padL + plotW - hmW - 18;
+  ctx.fillStyle = TSNE_BLUE; ctx.beginPath(); ctx.arc(dotX, legY1, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#555'; ctx.fillText('Humanoid', dotX + 10, legY1);
+  ctx.fillStyle = TSNE_YELLOW; ctx.beginPath(); ctx.arc(dotX, legY2, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#555'; ctx.fillText('Human', dotX + 10, legY2);
+  ctx.globalAlpha = 1;
+
+  canvas._tsneData = { merged: pts.map(p => ({ x: p.bx + (p.ux - p.bx) * t, y: p.by + (p.uy - p.by) * t, c: p.c })), sx, sy, r, W, H };
+}
+
+function animateMorph(canvas, pts, scale, fromT, toT, duration, onDone) {
+  const start = performance.now();
+  if (canvas._morphRaf) cancelAnimationFrame(canvas._morphRaf);
+  function tick(now) {
+    let progress = Math.min((now - start) / duration, 1);
+    progress = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+    const t = fromT + (toT - fromT) * progress;
+    drawMorphFrame(canvas, pts, t, scale);
+    if (progress < 1) { canvas._morphRaf = requestAnimationFrame(tick); }
+    else if (onDone) onDone();
+  }
+  canvas._morphRaf = requestAnimationFrame(tick);
+}
+
+function setupTsneHover(canvas) {
+  const tooltip = document.createElement('div');
+  tooltip.style.cssText = 'position:fixed;pointer-events:none;background:#1a1a1a;color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;font-family:Inter,sans-serif;display:none;z-index:999;box-shadow:0 2px 6px rgba(0,0,0,0.12);';
+  document.body.appendChild(tooltip);
+  canvas.addEventListener('mousemove', (e) => {
+    const d = canvas._tsneData;
+    if (!d) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    let found = null;
+    for (const pt of d.merged) {
+      const px = d.sx(pt.x), py = d.sy(pt.y);
+      if (Math.hypot(px - mx, py - my) < d.r + 5) { found = pt; break; }
+    }
+    if (found) {
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+      const label = found.c === TSNE_BLUE ? 'Humanoid' : 'Human';
+      tooltip.innerHTML = `<span style="color:${found.c}">\u25CF</span> ${label}`;
+    } else { tooltip.style.display = 'none'; }
+  });
+  canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+}
+
+fetch('data/tsne_coords.json').then(r => r.json()).then(data => {
+  _tsneGlobalData = data;
+  MORPH_CONFIGS.forEach(cfg => {
+    const canvas = document.getElementById(cfg.canvasId);
+    if (!canvas || !data[cfg.baselineKey] || !data[cfg.unitKey]) return;
+    const pts = buildMorphPoints(data, cfg.baselineKey, cfg.unitKey);
+    canvas._morphPts = pts;
+    canvas._morphT = 0;
+    const scale = computeScaling(pts, canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height);
+    canvas._morphScale = scale;
+    drawMorphFrame(canvas, pts, 0, scale);
+    setupTsneHover(canvas);
+  });
+
+  /* ── Create sliding pill indicators ── */
+  function positionSlider(bar) {
+    const activeBtn = bar.querySelector('.morph-btn.active');
+    const slider = bar.querySelector('.morph-slider');
+    if (!activeBtn || !slider) return;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+    slider.style.left = (btnRect.left - barRect.left) + 'px';
+    slider.style.width = btnRect.width + 'px';
+  }
+
+  document.querySelectorAll('.tsne-morph-bar').forEach(bar => {
+    const slider = document.createElement('div');
+    slider.className = 'morph-slider';
+    bar.appendChild(slider);
+    /* initial position without transition */
+    slider.style.transition = 'none';
+    requestAnimationFrame(() => {
+      positionSlider(bar);
+      requestAnimationFrame(() => { slider.style.transition = ''; });
+    });
+  });
+
+  document.querySelectorAll('.morph-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const canvasId = btn.dataset.morphCanvas;
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || !canvas._morphPts) return;
+      const bar = btn.parentElement;
+      bar.querySelectorAll('.morph-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      positionSlider(bar);
+      const toT = btn.dataset.morphState === 'unit' ? 1 : 0;
+      const fromT = canvas._morphT;
+      const cfg = MORPH_CONFIGS.find(c => c.canvasId === canvasId);
+      const label = document.getElementById('label-' + canvasId);
+      if (label) label.textContent = cfg.labels[toT];
+      const scale = computeScaling(canvas._morphPts, canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height);
+      canvas._morphScale = scale;
+      animateMorph(canvas, canvas._morphPts, scale, fromT, toT, 800, () => { canvas._morphT = toT; });
+    });
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      MORPH_CONFIGS.forEach(cfg => {
+        const canvas = document.getElementById(cfg.canvasId);
+        if (!canvas || !canvas._morphPts) return;
+        const scale = computeScaling(canvas._morphPts, canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height);
+        canvas._morphScale = scale;
+        drawMorphFrame(canvas, canvas._morphPts, canvas._morphT || 0, scale);
+      });
+      document.querySelectorAll('.tsne-morph-bar').forEach(bar => positionSlider(bar));
+    }, 100);
+  });
+});
+
+/* ── Copy BibTeX ── */
+function copyBib() {
+  const bib = document.querySelector('.citation-block').innerText.replace('Copy', '').trim();
+  navigator.clipboard.writeText(bib);
+  const btn = document.querySelector('.copy-btn');
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+
+/* ── Nav highlight ── */
+const sections = document.querySelectorAll('.section, .tsne-section, .hero');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (scrollY >= s.offsetTop - 100) current = s.getAttribute('id'); });
+  navLinks.forEach(l => {
+    const active = l.getAttribute('href') === '#' + current;
+    l.style.color = active ? '#1a1a1a' : '';
+    l.style.fontWeight = active ? '600' : '';
+  });
+});
+</script>
+
+</body>
+</html>

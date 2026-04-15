@@ -1,0 +1,4 @@
+Method,Pick and Place,Bimanual Cooperation
+GR00T-Qwen2.5,12/40,1/20
+Factory Pretrain Only,28/40,7/20
+Egodex+Factory,31/40,15/20

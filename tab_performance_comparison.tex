@@ -1,0 +1,24 @@
+\begin{table}[t]
+  \caption{\textbf{Controllable generation.} Comparison across three datasets. WM-UniT improves visual quality (PSNR, SSIM, LPIPS), temporal consistency (FVD), and action controllability (EPE) over raw action conditioning.}
+  \label{tab:wm-comparison}
+  \centering
+  \small
+  \begin{tabular}{llccccc}
+    \toprule
+    Dataset & Method & PSNR $\uparrow$ & SSIM $\uparrow$ & LPIPS $\downarrow$ & FVD $\downarrow$ & EPE $\downarrow$ \\
+    \midrule
+    \multirow{3}{*}{DROID}
+    & Raw Action    & 21.02 & 0.820 & 0.097 & \textbf{76.38} & 0.266 \\
+    & WM-Action & 20.86 & 0.819 & 0.102 & 80.30 & 0.259 \\
+    & WM-UniT & \textbf{21.32} & \textbf{0.823} & \textbf{0.095} & 76.44 & \textbf{0.259} \\
+    \midrule
+    \multirow{2}{*}{EgoDex}
+    & Raw Action    & 24.84 & 0.800 & 0.164 & 171.37 & 0.706 \\
+    & WM-UniT & \textbf{28.06} & \textbf{0.858} & \textbf{0.086} & \textbf{130.87} & \textbf{0.519} \\
+    \midrule
+    \multirow{2}{*}{RoboCasa-GR1}
+    & Raw Action    & 13.45 & 0.590 & 0.259 & 237.13 & 0.558 \\
+    & WM-UniT & \textbf{17.66} & \textbf{0.718} & \textbf{0.142} & \textbf{166.50} & \textbf{0.453} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

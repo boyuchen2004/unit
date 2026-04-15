@@ -1,0 +1,13 @@
+\begin{table}[t]
+  \caption{\textbf{Human data pre-training for world modeling.} Impact of human data pre-training on RoboCasa-GR1 generation quality.}
+  \label{tab:wm-human-pretrain}
+  \centering
+  \begin{tabular}{lccccc}
+    \toprule
+    Configuration & PSNR $\uparrow$ & SSIM $\uparrow$ & LPIPS $\downarrow$ & FVD $\downarrow$ & EPE $\downarrow$ \\
+    \midrule
+    WM-UniT w/o Human Pre-training & 16.34 & 0.678 & 0.168 & 180.51 & 0.478 \\
+    WM-UniT (Full)             & \textbf{18.06} & \textbf{0.713} & \textbf{0.135} & \textbf{153.31} & \textbf{0.446} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
