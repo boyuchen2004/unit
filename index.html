@@ -217,17 +217,20 @@
       object-fit: cover;
       aspect-ratio: calc(4 * var(--id-crop-w)) / 3;
     }
-    /* OOD col-1 Robot Demo: crop top (keep bottom var(--ood-robot-crop-h))
-       + crop sides (banana keep left var(--ood-robot-crop-w), bowl keep right) */
+    /* OOD col-1 Robot Demo: show only the bottom 80% × 80% of source.
+       Display aspect ratio unchanged (16:9). Source is not altered — we scale
+       the video up by 1 / crop-w and clip with overflow:hidden; transform-origin
+       selects which 80%×80% region remains visible. */
+    .ood-zone--train .robot-demo-card .video-card-inner { overflow: hidden; }
     .ood-zone--train .robot-demo-card video {
-      object-fit: cover;
-      aspect-ratio: calc(16 * var(--ood-robot-crop-w)) / calc(9 * var(--ood-robot-crop-h));
+      aspect-ratio: 16 / 9;
+      transform: scale(calc(1 / var(--ood-robot-crop-w)));
     }
     .ood-zone--train .robot-demo-card video[data-src$="robot-banana.mp4"] {
-      object-position: left bottom;
+      transform-origin: left bottom;
     }
     .ood-zone--train .robot-demo-card video[data-src$="robot-bowl-1.mp4"] {
-      object-position: right bottom;
+      transform-origin: right bottom;
     }
     /* OOD col-3 Execution: crop sides to center var(--ood-exec-crop-w) width */
     .ood-zone--exec .real-video-card video {
