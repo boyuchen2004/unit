@@ -45,11 +45,16 @@ def parse_fraction(frac_str):
     num, denom = frac_str.split('/')
     return int(num), int(denom)
 
-# 类别列表
-category_cols = ['Visual Robustness', 'Target Level Transfer', 'Distractor Robustness', 
-                 'Geometric Generalization', 'Combinatorial Generalization']
+# 类别列表（与 data/real_robot.csv 表头一致）
+category_cols = [
+    'Background Generalization',
+    'Target Generalization',
+    'Distractor Generalization',
+    'Geometric Generalization',
+    'Combinatorial Generalization',
+]
 
-# 构建类别数据
+# 构建类别数据：(显示名, 成功率数组, 各方法试验次数列表)
 categories = []
 for col in category_cols:
     values = []
@@ -58,9 +63,8 @@ for col in category_cols:
         num, denom = parse_fraction(val)
         values.append(num / denom)
         n_trials_list.append(denom)
-    # 简化类别名
     short_name = col.replace(' ', '\n')
-    categories.append((short_name, np.array(values), n_trials_list[0]))
+    categories.append((short_name, np.array(values), n_trials_list))
 
 n_categories = len(categories)
 
@@ -85,8 +89,8 @@ group_width = n_methods + 1.5
 bar_width = 0.70
 
 # 绘制每个类别
-for cat_idx, (cat_name, values, n_samples) in enumerate(categories):
-    se = np.array([calc_se(p, n_samples) for p in values])
+for cat_idx, (cat_name, values, n_per_method) in enumerate(categories):
+    se = np.array([calc_se(p, n) for p, n in zip(values, n_per_method)])
     
     base_x = cat_idx * group_width
     x_positions = base_x + np.arange(n_methods)
@@ -120,9 +124,11 @@ for cat_idx, (cat_name, values, n_samples) in enumerate(categories):
             ax.annotate(label, xy=(x_positions[i], y_pos), ha='center', va='bottom',
                         fontsize=9, color='#555555')
     
-    # 样本量标注
+    # 样本量标注（同列各方法 n 可能不同，如 Combinatorial 30 vs 10）
     x_right = base_x + n_methods - 0.5
-    ax.text(x_right, 0.92, f'n={n_samples}', ha='right', va='top',
+    uniq_n = sorted(set(n_per_method))
+    n_label = f'n={uniq_n[0]}' if len(uniq_n) == 1 else 'n=' + ','.join(str(n) for n in uniq_n)
+    ax.text(x_right, 0.92, n_label, ha='right', va='top',
             fontsize=9, color='#777777', style='italic')
 
 # X轴类别标签

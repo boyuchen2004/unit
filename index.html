@@ -86,6 +86,40 @@
     .insight-box p { font-size: 16px; line-height: 1.625; }
     .insight-box em { font-style: italic; font-weight: 600; }
 
+    /* Motivation — design-choices list */
+    .design-choices { list-style: none; padding: 0; margin: 16px 0 20px; display: grid; gap: 12px; }
+    .design-choices li { padding: 14px 18px; background: var(--accent-light); border-left: 3px solid var(--border); border-radius: 0 6px 6px 0; color: var(--text); font-size: 15px; line-height: 1.6; }
+    .design-choices li strong { display: block; margin-bottom: 4px; font-size: 14px; color: var(--text); font-weight: 700; }
+
+    /* Motivation — pull quote */
+    .pullquote { margin: 28px 0; padding: 22px 28px; border-left: 3px solid var(--blue); background: rgba(91,141,201,0.08); font-size: 18px; line-height: 1.5; font-style: italic; color: var(--text); border-radius: 0 var(--radius) var(--radius) 0; }
+
+    /* Motivation — Fig 2 four-panel design comparison */
+    .design-fig { margin: 32px 0; }
+    .design-fig-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: stretch; }
+    .design-fig .panel { border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: #fff; display: flex; flex-direction: column; min-width: 0; }
+    .design-fig .panel.highlight { border-color: var(--blue); background: rgba(91,141,201,0.06); box-shadow: 0 6px 18px -8px rgba(91,141,201,0.35); }
+    .design-fig .panel-head { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
+    .design-fig .panel-label { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; font-weight: 700; color: var(--text-light); letter-spacing: 0.02em; }
+    .design-fig .panel.highlight .panel-label { color: var(--blue); }
+    .design-fig .panel-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
+    .design-fig .svg-wrap { display: flex; align-items: center; justify-content: center; height: 120px; }
+    .design-fig svg.arch { display: block; width: 100%; height: 100%; }
+    .design-fig .panel-caption { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin: 12px 0 0; min-height: 3em; }
+    .design-fig .panel.highlight .panel-caption { color: var(--text); }
+    .design-fig figcaption { font-size: 13px; color: var(--text-muted); margin: 10px auto 0; text-align: center; line-height: 1.55; max-width: 680px; }
+    .design-fig .fig-legend { display: flex; gap: 18px; justify-content: center; margin-top: 14px; font-size: 12px; color: var(--text-muted); }
+    .design-fig .fig-legend .color-tag { display: inline-flex; align-items: center; gap: 5px; }
+    .design-fig .fig-legend .swatch { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    @media (max-width: 900px) {
+      .design-fig-grid { grid-template-columns: repeat(2, 1fr); }
+      .design-fig .svg-wrap { height: 140px; }
+      .design-fig .panel-caption { min-height: 0; }
+    }
+    @media (max-width: 520px) {
+      .design-fig-grid { grid-template-columns: 1fr; }
+    }
+
     /* Method */
     .method-figure { margin: 36px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .method-figure img { width: 100%; display: block; }
@@ -478,30 +512,228 @@
   <div class="container-wide">
     <div class="section-label">Motivation</div>
     <h2 class="section-title">The Human-to-Humanoid Transfer Problem</h2>
-    <p class="section-subtitle">Scaling humanoid foundation models is bottlenecked by scarce robot data. Massive human motion sequences provide a scalable alternative rich in physical interaction priors — but biomechanical and hardware differences create heterogeneous state-action spaces with mismatched degrees of freedom and control paradigms.</p>
-    <div class="problem-grid">
-      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Motion Retargeting</h4><p>Complex kinematic solvers map human motions to specific robots case by case. <strong style="color:var(--text);">Labor-intensive</strong> and <strong style="color:var(--text);">unscalable</strong> — retargeted actions often <strong style="color:var(--text);">misalign</strong> with the original visual observations.</p></div>
-      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> End-to-End Co-Training</h4><p>Co-training on mixed embodiment data end-to-end forces the model to fit fundamentally <strong style="color:var(--text);">different action distributions</strong> simultaneously, often leading to <strong style="color:var(--text);">embodiment-specific shortcuts</strong> rather than shared representations.</p></div>
-      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Action-Only Tokenization</h4><p>Relies exclusively on proprioceptive reconstruction. Without external visual grounding, these representations suffer from <strong style="color:var(--text);">severe distribution shifts</strong> between humans and robots.</p></div>
-      <div class="problem-card"><h4><span class="x-mark">&#x2715;</span> Vision-Only Latent Actions</h4><p>Infers intent directly from pixels, bypassing kinematic mismatches. But prone to entangling low-level <strong style="color:var(--text);">appearance confounders</strong> (textures, lighting) and leaves <strong style="color:var(--text);">structural priors</strong> of human pose data underexploited.</p></div>
-    </div>
-    <p class="section-subtitle" style="margin-top: 32px;">How do existing paradigms compare across the key desiderata for human-to-humanoid transfer?</p>
-    <div class="chart-container" style="overflow-x: auto; margin-top: 16px;">
-      <table class="data-table" style="text-align: center;">
-        <thead><tr><th style="text-align: left;">Approach</th><th>Scalable</th><th>Visual Grounding</th><th>Kinematic Aware</th><th>Cross-Embodiment</th><th>Noise Robust</th></tr></thead>
-        <tbody>
-          <tr><td class="method-name" style="text-align: left;">Motion Retargeting</td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-bad"></span></td></tr>
-          <tr><td class="method-name" style="text-align: left;">End-to-End Co-Training</td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-bad"></span></td></tr>
-          <tr><td class="method-name" style="text-align: left;">Action-Only Tokenization</td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-bad"></span></td></tr>
-          <tr><td class="method-name" style="text-align: left;">Vision-Only Latent Actions</td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-bad"></span></td><td><span class="cmp-face cmp-mid"></span></td><td><span class="cmp-face cmp-bad"></span></td></tr>
-          <tr class="highlight-row"><td class="method-name" style="text-align: left; font-weight:700; color:var(--blue);">UniT (Ours)</td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td><td><span class="cmp-face cmp-good"></span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="insight-box">
-      <div class="label">Our Key Insight</div>
-      <p>While human and humanoid kinematics differ in structural DoFs and contain embodiment-specific noise, <em>the physical outcomes of their intents share a consistent visual representation</em>. Visual observations can therefore serve as a <em>universal anchor</em> to ground and align disparate kinematic spaces — filtering out visually unobservable artifacts while preserving embodiment-agnostic physical intent.</p>
-    </div>
+
+    <p class="narrative-text">Humanoid data is scarce. Human motion is abundant. But the two bodies don't match. To train on both, we need a <strong>medium</strong> that aligns their action spaces.</p>
+
+    <p class="narrative-text">The traditional medium is <strong>motion retargeting</strong>. For each robot, a kinematic solver is hand-engineered to rewrite human joints into robot joints. The action gets converted, but the video does not. As a result, training still pairs human visual observations with robot actions. The mismatch is built into the learning problem from the start. And because every new robot needs its own solver, this pipeline does not scale cleanly.</p>
+
+    <p class="narrative-text">We want a better medium. It should scale without per-robot engineering. It should also avoid the visual-action mismatch. The answer is a <strong>shared latent action space</strong>. The question is what that space should look like.</p>
+
+    <!-- Act 2: Design space -->
+    <div class="topic-header">What Should That Latent Look Like?</div>
+
+    <p class="narrative-text">Prior designs differ in how tightly they align vision and action.</p>
+
+    <ul class="design-choices">
+      <li>
+        <strong>&#9312; Single modality.</strong>
+        Action-only tokenizers miss visual grounding. Vision-only tokenizers entangle appearance and waste pose priors.
+      </li>
+      <li>
+        <strong>&#9313; Dual modality, loose alignment.</strong>
+        Both modalities are encoded. But the alignment is absent, one-way, or only distributional.
+      </li>
+    </ul>
+
+    <p class="narrative-text">All of them miss the same thing. Vision and action may be brought closer, but they are still modeled as separate spaces. What is missing is a single representation that both modalities truly share.</p>
+
+    <!-- Figure 2: four-panel comparison -->
+    <figure class="design-fig">
+      <div class="design-fig-grid">
+
+        <!-- (a) Action-Only -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-label">(a)</span>
+            <span class="panel-title">Action-Only</span>
+          </div>
+          <div class="svg-wrap">
+            <svg class="arch" viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg" aria-label="Action-only tokenizer">
+              <defs>
+                <marker id="ga-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#C28A3A"/>
+                </marker>
+              </defs>
+              <g font-family="Inter,ui-sans-serif,-apple-system,sans-serif" font-size="12" fill="#374151">
+                <rect x="14"  y="36" width="52" height="28" rx="5" fill="#FFF8EE" stroke="#C28A3A"/>
+                <text x="40"  y="54" text-anchor="middle" fill="#8A5B1E">A-Enc</text>
+                <line x1="66" y1="50" x2="86" y2="50" stroke="#C28A3A" stroke-width="1.3" marker-end="url(#ga-arr)"/>
+                <rect x="86"  y="38" width="48" height="24" rx="5" fill="#F8E8CF" stroke="#C28A3A"/>
+                <text x="110" y="54" text-anchor="middle" font-style="italic" fill="#8A5B1E">z&#x2090;</text>
+                <line x1="134" y1="50" x2="154" y2="50" stroke="#C28A3A" stroke-width="1.3" marker-end="url(#ga-arr)"/>
+                <rect x="154" y="36" width="52" height="28" rx="5" fill="#FFF8EE" stroke="#C28A3A"/>
+                <text x="180" y="54" text-anchor="middle" fill="#8A5B1E">A-Dec</text>
+              </g>
+            </svg>
+          </div>
+          <p class="panel-caption">Action reconstructs itself. No visual grounding. Codes stay embodiment-specific.</p>
+        </div>
+
+        <!-- (b) Vision-Only -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-label">(b)</span>
+            <span class="panel-title">Vision-Only</span>
+          </div>
+          <div class="svg-wrap">
+            <svg class="arch" viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg" aria-label="Vision-only tokenizer">
+              <defs>
+                <marker id="gb-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#5B8DC9"/>
+                </marker>
+              </defs>
+              <g font-family="Inter,ui-sans-serif,-apple-system,sans-serif" font-size="12" fill="#374151">
+                <rect x="14"  y="36" width="52" height="28" rx="5" fill="#F7FAFE" stroke="#5B8DC9"/>
+                <text x="40"  y="54" text-anchor="middle" fill="#3D6DA0">V-Enc</text>
+                <line x1="66" y1="50" x2="86" y2="50" stroke="#5B8DC9" stroke-width="1.3" marker-end="url(#gb-arr)"/>
+                <rect x="86"  y="38" width="48" height="24" rx="5" fill="#DCE9F5" stroke="#5B8DC9"/>
+                <text x="110" y="54" text-anchor="middle" font-style="italic" fill="#3D6DA0">z&#x1D65;</text>
+                <line x1="134" y1="50" x2="154" y2="50" stroke="#5B8DC9" stroke-width="1.3" marker-end="url(#gb-arr)"/>
+                <rect x="154" y="36" width="52" height="28" rx="5" fill="#F7FAFE" stroke="#5B8DC9"/>
+                <text x="180" y="54" text-anchor="middle" fill="#3D6DA0">V-Dec</text>
+              </g>
+            </svg>
+          </div>
+          <p class="panel-caption">Vision reconstructs itself. Pose priors are ignored. Appearance gets entangled.</p>
+        </div>
+
+        <!-- (c) Dual, Loose Alignment -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-label">(c)</span>
+            <span class="panel-title">Dual, Loose Align.</span>
+          </div>
+          <div class="svg-wrap">
+            <svg class="arch" viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg" aria-label="Dual but loosely aligned">
+              <defs>
+                <marker id="gc-arr-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#5B8DC9"/>
+                </marker>
+                <marker id="gc-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#C28A3A"/>
+                </marker>
+              </defs>
+              <g font-family="Inter,ui-sans-serif,-apple-system,sans-serif" font-size="11" fill="#374151">
+                <rect x="14"  y="14" width="48" height="22" rx="4" fill="#F7FAFE" stroke="#5B8DC9"/>
+                <text x="38"  y="28" text-anchor="middle" fill="#3D6DA0">V-Enc</text>
+                <line x1="62" y1="25" x2="80" y2="25" stroke="#5B8DC9" stroke-width="1.2" marker-end="url(#gc-arr-v)"/>
+                <rect x="80"  y="15" width="44" height="20" rx="4" fill="#EAEFF5" stroke="#9ca3af"/>
+                <text x="102" y="28" text-anchor="middle" font-style="italic" fill="#6b7280">z&#x1D65;</text>
+                <line x1="124" y1="25" x2="142" y2="25" stroke="#5B8DC9" stroke-width="1.2" marker-end="url(#gc-arr-v)"/>
+                <rect x="142" y="14" width="48" height="22" rx="4" fill="#F7FAFE" stroke="#5B8DC9"/>
+                <text x="166" y="28" text-anchor="middle" fill="#3D6DA0">V-Dec</text>
+                <rect x="14"  y="64" width="48" height="22" rx="4" fill="#FFF8EE" stroke="#C28A3A"/>
+                <text x="38"  y="78" text-anchor="middle" fill="#8A5B1E">A-Enc</text>
+                <line x1="62" y1="75" x2="80" y2="75" stroke="#C28A3A" stroke-width="1.2" marker-end="url(#gc-arr-a)"/>
+                <rect x="80"  y="65" width="44" height="20" rx="4" fill="#EAEFF5" stroke="#9ca3af"/>
+                <text x="102" y="78" text-anchor="middle" font-style="italic" fill="#6b7280">z&#x2090;</text>
+                <line x1="124" y1="75" x2="142" y2="75" stroke="#C28A3A" stroke-width="1.2" marker-end="url(#gc-arr-a)"/>
+                <rect x="142" y="64" width="48" height="22" rx="4" fill="#FFF8EE" stroke="#C28A3A"/>
+                <text x="166" y="78" text-anchor="middle" fill="#8A5B1E">A-Dec</text>
+                <!-- optional global distribution alignment (no information flow) -->
+                <line x1="102" y1="35" x2="102" y2="65" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2.5 2"/>
+                <text x="102" y="96" text-anchor="middle" font-size="7" fill="#9ca3af" font-style="italic">optional global distribution alignment</text>
+              </g>
+            </svg>
+          </div>
+          <p class="panel-caption">Each modality reconstructs itself. Alignment is at most distribution-level (dashed). No information flows between them.</p>
+        </div>
+
+        <!-- (d) UniT (Ours) -->
+        <div class="panel highlight">
+          <div class="panel-head">
+            <span class="panel-label">(d)</span>
+            <span class="panel-title">UniT (Ours)</span>
+          </div>
+          <div class="svg-wrap">
+            <svg class="arch" viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg" aria-label="UniT shared codebook with cross-reconstruction">
+              <defs>
+                <marker id="gd-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#5B8DC9"/>
+                </marker>
+                <marker id="gd-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#C28A3A"/>
+                </marker>
+              </defs>
+
+              <!-- Encoders / Codebook / Decoders -->
+              <g font-family="Inter,ui-sans-serif,-apple-system,sans-serif" font-size="11">
+                <rect x="10"  y="14" width="44" height="22" rx="4" fill="#fff" stroke="#5B8DC9"/>
+                <text x="32"  y="28" text-anchor="middle" fill="#3D6DA0">V-Enc</text>
+                <rect x="10"  y="64" width="44" height="22" rx="4" fill="#fff" stroke="#C28A3A"/>
+                <text x="32"  y="78" text-anchor="middle" fill="#8A5B1E">A-Enc</text>
+
+                <rect x="82"  y="30" width="56" height="40" rx="6" fill="#DCE9F5" stroke="#5B8DC9" stroke-width="1.8"/>
+                <text x="110" y="40" text-anchor="middle" font-weight="700" font-size="9.5" fill="#3D6DA0">shared</text>
+                <text x="110" y="50" text-anchor="middle" font-size="9.5" fill="#3D6DA0">codebook</text>
+                <text x="110" y="63" text-anchor="middle" font-size="10" fill="#3D6DA0" font-style="italic">z<tspan font-size="7" dy="2">unified</tspan></text>
+
+                <rect x="166" y="14" width="44" height="22" rx="4" fill="#fff" stroke="#5B8DC9"/>
+                <text x="188" y="28" text-anchor="middle" fill="#3D6DA0">V-Dec</text>
+                <rect x="166" y="64" width="44" height="22" rx="4" fill="#fff" stroke="#C28A3A"/>
+                <text x="188" y="78" text-anchor="middle" fill="#8A5B1E">A-Dec</text>
+              </g>
+
+              <!-- Encoder → codebook (2 color-coded streams) -->
+              <line x1="54" y1="25" x2="82" y2="38" stroke="#5B8DC9" stroke-width="1.5" marker-end="url(#gd-v)"/>
+              <line x1="54" y1="75" x2="82" y2="62" stroke="#C28A3A" stroke-width="1.5" marker-end="url(#gd-a)"/>
+
+              <!-- Codebook → decoders: 4 arrows (each modality token reconstructs BOTH) -->
+              <line x1="138" y1="38" x2="166" y2="22" stroke="#5B8DC9" stroke-width="1.5" marker-end="url(#gd-v)"/>
+              <line x1="138" y1="44" x2="166" y2="30" stroke="#C28A3A" stroke-width="1.5" marker-end="url(#gd-a)"/>
+              <line x1="138" y1="56" x2="166" y2="70" stroke="#5B8DC9" stroke-width="1.5" marker-end="url(#gd-v)"/>
+              <line x1="138" y1="62" x2="166" y2="78" stroke="#C28A3A" stroke-width="1.5" marker-end="url(#gd-a)"/>
+
+              <!-- Flow particles (staggered) -->
+              <circle r="1.8" cx="54" cy="25" fill="#5B8DC9" opacity="0.9">
+                <animate attributeName="cx" values="54;82" dur="1.8s" begin="0s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="25;38" dur="1.8s" begin="0s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.8" cx="54" cy="75" fill="#C28A3A" opacity="0.9">
+                <animate attributeName="cx" values="54;82" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="75;62" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.8" cx="138" cy="38" fill="#5B8DC9" opacity="0.9">
+                <animate attributeName="cx" values="138;166" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="38;22" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.8" cx="138" cy="44" fill="#C28A3A" opacity="0.9">
+                <animate attributeName="cx" values="138;166" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="44;30" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.8" cx="138" cy="56" fill="#5B8DC9" opacity="0.9">
+                <animate attributeName="cx" values="138;166" dur="1.8s" begin="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="56;70" dur="1.8s" begin="1.2s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.8" cx="138" cy="62" fill="#C28A3A" opacity="0.9">
+                <animate attributeName="cx" values="138;166" dur="1.8s" begin="1.5s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="62;78" dur="1.8s" begin="1.5s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+          <p class="panel-caption"><strong>Cross-reconstruction</strong> through one codebook. Every branch's token must decode into <em>both</em> modalities.</p>
+        </div>
+
+      </div>
+      <div class="fig-legend" aria-label="Color legend for panel (d)">
+        <span class="color-tag"><span class="swatch" style="background:#5B8DC9;"></span>vision stream</span>
+        <span class="color-tag"><span class="swatch" style="background:#C28A3A;"></span>action stream</span>
+      </div>
+      <figcaption>Four ways to build a shared latent action space. Only UniT forces vision and action to pass through <em>a single codebook</em> and reconstruct each other. It is the only design where every code is anchored on both sides.</figcaption>
+    </figure>
+
+    <!-- Act 3: Vision as the Anchor (renamed to avoid collision with Method section title) -->
+    <div class="topic-header">Vision as the Anchor</div>
+
+    <p class="narrative-text">If we can't align bodies directly, we need an <strong>anchor</strong>. Vision is the natural candidate. Human and humanoid kinematics may differ, but the physical outcomes of their intents share a consistent visual representation. That is why visual observations can serve as a universal anchor for aligning disparate kinematic spaces.</p>
+
+    <p class="narrative-text">But vision alone is not enough. Video mixes physical change with appearance factors such as background, lighting, and texture. Action traces have their own noise as well, including embodiment-specific kinematics and sensor jitter. Neither modality is pure signal on its own.</p>
+
+    <p class="narrative-text">They do, however, describe the same physical event from different sides.</p>
+
+    <blockquote class="pullquote">Whatever is coherent across both is physical by construction. Whatever only one side can see is noise.</blockquote>
+
+    <p class="narrative-text">UniT turns that coherence into the anchor. Vision and action are forced to reconstruct each other through a shared codebook. Only the mutual signal survives. What remains is embodiment-agnostic physical intent. We call it the <strong>Unified Latent Action</strong>.</p>
   </div>
 </section>
 
@@ -509,7 +741,7 @@
 <section class="section" id="method">
   <div class="container-wide">
     <div class="section-label">Method</div>
-    <h2 class="section-title">Visual Anchoring via Cross-Reconstruction</h2>
+    <h2 class="section-title">UniT: Unified Latent Action Tokenizer via Visual Anchoring</h2>
     <p class="section-subtitle">UniT functions as a cross-modal information bottleneck: it concurrently extracts temporal-visual, kinematic, and fused visuo-motor features, and enforces rigorous cross-reconstruction to distill the embodiment-agnostic physical intent.</p>
     <figure class="method-figure">
       <video data-src="method.mp4?v=1776341418" loop muted playsinline style="width: 100%; display: block;"></video>
@@ -1635,9 +1867,9 @@
   <div class="container">
     <div class="section-label">Looking Forward</div>
     <h2 class="section-title">Toward Scalable Embodied Intelligence</h2>
-    <p class="narrative-text">We presented <strong>UniT</strong> &mdash; a visual-anchored latent action tokenizer that establishes a unified physical language for human-to-humanoid transfer through cross-reconstruction.</p>
-    <p class="narrative-text">Looking forward, the visual branch of UniT encodes physical transitions from observations alone, without requiring paired action annotations. This opens a path toward absorbing the vast and largely untapped reservoir of <strong>internet-scale video</strong>, where humans perform diverse physical tasks without motor labels &mdash; an additional source of physical priors that enriches the shared latent space, readily scalable to heterogeneous human motion data without manual kinematic correspondence.</p>
-    <p class="narrative-text">Furthermore, UniT serving as a unified interface for both policy and world model suggests a deeper possibility: policies propose latent actions, world models simulate their visual consequences, and the imagined rollouts flow back as reward signals for reinforcement learning or enable test-time planning through search over the latent space &mdash; a closed-loop co-evolution mediated entirely within the shared token space, a compelling route toward scalable embodied intelligence.</p>
+    <p class="narrative-text">We presented <strong>UniT</strong>, a visual-anchored latent action tokenizer that projects heterogeneous human and humanoid data into a shared discrete space through tri-branch cross-reconstruction. Deployed as <strong>VLA-UniT</strong> and <strong>WM-UniT</strong>, it enables consistent human-to-humanoid OOD transfer in both simulation and the real world, zero-shot task transfer with emergent upper-body coordination, and cross-embodiment dynamics transfer for world modeling. Ablations confirm that having both modalities is not enough on its own. A shared vocabulary only emerges when the two are explicitly forced to reconstruct each other.</p>
+    <p class="narrative-text">With this shared space now in place, the natural question is how far it can scale. UniT's visual branch encodes physical transitions from observations alone, without paired action labels, so the shared space is readily extensible to video sources that never came with motor annotations, including the vast reservoirs of <strong>internet and egocentric video</strong>. And because alignment in UniT is entirely data-driven, even diverse human motion capture can enter the same space directly, without per-robot retargeting. Full-body coordination and dexterous control, in all the variety already recorded, can keep pouring into one latent vocabulary.</p>
+    <p class="narrative-text">Beyond what can enter this shared space, there is the question of what can happen inside it. The same vocabulary is already spoken by both policies and world models, so a policy can propose latent actions that a world model simulates into visual consequences, and those imagined rollouts can feed back as reward signals for reinforcement learning or as search targets for test-time planning, all within one shared space. UniT has so far shown this space as a substrate for transfer. Turning it into a substrate for <strong>closed-loop embodied reasoning</strong> is what we find most compelling to explore next.</p>
   </div>
 </section>
 

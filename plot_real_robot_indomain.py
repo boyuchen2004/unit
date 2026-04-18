@@ -43,7 +43,7 @@ def parse_fraction(frac_str):
     return int(num), int(denom)
 
 # 类别列表
-category_cols = ['Pick and Place', 'Bimanual Cooperation']
+category_cols = ['Pick and Place', 'Pouring']
 
 # 构建类别数据
 categories = []
